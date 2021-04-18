@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "fcntl.h": "c",
+        "tlpi_hdr.h": "c",
+        "unistd.h": "c"
+    }
+}
