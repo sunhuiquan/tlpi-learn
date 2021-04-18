@@ -1,10 +1,20 @@
-#define _POSIX_SOURCE
+// It works fine
+// #include <unistd.h>
+// #include <sys/reboot.h>
+
+// int main()
+// {
+//     reboot(RB_AUTOBOOT);
+//     return 0;
+// }
+
+// It works well too.
 #include <unistd.h>
 #include <linux/reboot.h>
 
+int reboot(int);
 int main()
 {
-
-    reboot(LINUX_REBOOT_MAGIC1, LINUX_REBOOT_MAGIC2A, LINUX_REBOOT_CMD_RESTART, 0);
+    reboot(LINUX_REBOOT_CMD_RESTART);
     return 0;
 }
