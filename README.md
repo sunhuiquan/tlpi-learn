@@ -31,7 +31,7 @@
 ---
 
 ## CH3
-### 3.1
+### [3.1](./Exercise/3_1.c)
 ```
     #include <unistd.h>
     #include <sys/reboot.h>
