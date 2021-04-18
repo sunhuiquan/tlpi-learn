@@ -1,14 +1,37 @@
 # TLPI_learn_note
-My notes and solutions for The Linux Programing Interface(《LINUX/LINUX系统编程手册》笔记和解答)
+《LINUX/LINUX系统编程手册》学习记录和练习习题解答。
 
+## 环境搭建
+```
+    wget https://man7.org/tlpi/code/download/tlpi-201025-dist.tar.gz
+    tar -zxvf tlpi-201025-dist.tar.gz
+    cd tlpi-dist/
+    make
+```
 
+```
+    cd lib/
+    sudo cp tlpi_hdr.h /usr/local/include/
+    sudo cp get_num.h /usr/local/include/
+    sudo cp error_functions.h /usr/local/include/
+    sudo cp ename.c.inc /usr/local/include/
+```
 
-## 习题解答：
+如果没有静态库的话需要手动创建,现在的新版本并不需要这一步，所以这一步不做
+```
+    g++ -c get_num.c error_functions.c
+    ar -crv libtlpi.a get_num.o error_functions.o
+    sudo cp libtlpi.a /usr/local/lib
+```
 
-### 环境搭建
+运行需要链接libtlpi.a静态库
+```
+    g++ main.cpp -o main -ltlpi
+```
+---
 
-### CH3
-#### 3.1
+## CH3
+### 3.1
 ```
     #include <unistd.h>
     #include <sys/reboot.h>
@@ -32,3 +55,7 @@ My notes and solutions for The Linux Programing Interface(《LINUX/LINUX系统�
     }
 ```
 这里的LINUX_REBOOT_MAGIC1、LINUX_REBOOT_MAGIC2A参数在linux/reboot.h中被定义,这些参数是Linux的作者Linus Torvalds自己和他三个女儿的生日。
+---
+
+## CH4
+### 4.1
