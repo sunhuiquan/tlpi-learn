@@ -43,7 +43,7 @@
 ```
 注意使用root权限。RB_AUTOBOOT 是定义在reboot.h头文件中的。如果我们换成RB_POWER_OFF 则系统直接关机。
 
-在其他的Linux中，我们也可以使用如下的程序进行重启。(然而我的Ubuntu 20.04发行版运行不了，只可以上面方式运行，不过这些细节无所谓啦)
+在其他的Linux中，我们也可以使用如下的程序进行重启。(然而我的Ubuntu 20.04发行版运行不了，只可以上面方式运行，不过这是发行版和具体版本的问题，毕竟书都过了六七年了。)
 
 ```
     #include <unistd.h>
@@ -55,6 +55,19 @@
     }
 ```
 这里的LINUX_REBOOT_MAGIC1、LINUX_REBOOT_MAGIC2A参数在linux/reboot.h中被定义,这些参数是Linux的作者Linus Torvalds自己和他三个女儿的生日。
+
+我又稍微研究了一下，发现warning: implicit declaration of function，linux/reboot.h这个头文件没有声明reboot函数，出于别的考虑吧，再说应该用glibc的reboot比较好吧。写下声明，这样main函数内的调用就能找到reboot函数了。
+```
+    #include <unistd.h>
+    #include <linux/reboot.h>
+
+    int reboot(int);
+    int main()
+    {
+        reboot(LINUX_REBOOT_CMD_RESTART);
+        return 0;
+    }
+```
 ---
 
 ## CH4
