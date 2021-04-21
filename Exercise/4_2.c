@@ -1,7 +1,6 @@
 #include "tlpi_hdr.h"
 #include <fcntl.h>
 #include <unistd.h>
-#include <fs.h>
 #include <sys/types.h>
 
 // 生成一个空洞文件
