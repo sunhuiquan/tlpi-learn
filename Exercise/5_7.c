@@ -36,26 +36,28 @@ int main()
     if (mywritev(fd, iovec, 2) != iovec[0].iov_len + iovec[1].iov_len)
         printf("writev error: %s\n", strerror(errno));
     close(fd); // 刷新确保写入文件，不过open用同步选项加上lseek()也可以实现
-    // if ((fd = open("5_7file", O_RDONLY)) < 0)
-    //     printf("open error: %s\n", strerror(errno));
-    // if (readv(fd, iovec2, 2) != iovec2[0].iov_len + iovec2[1].iov_len)
-    //     printf("readv error: %s\n", strerror(errno));
 
-    // memset(b3, 0, sizeof(b3));
-    // memset(b4, 0, sizeof(b4));
-    // // 挨个char打印是因为缓冲区有没有哨兵，而且这又不一定是char类型，00可能只是一个
-    // // 值的01 00 00 00(小段int 1)的部分而已，我这里是知道我写的是char，所以用char读
-    // // 罢了，又不一定是char，当然不一定是'\0'了，而且没有意义
-    // size_t sz = sizeof(b3);
-    // for (size_t i = 0; i < sz; ++i)
-    // {
-    //     printf("%c", b3[i]);
-    // }
-    // sz = sizeof(b4);
-    // for (size_t i = 0; i < sz; ++i)
-    // {
-    //     printf("%c", b4[i]);
-    // }
+    memset(b3, 0, sizeof(b3));
+    memset(b4, 0, sizeof(b4));
+    if ((fd = open("5_7file", O_RDONLY)) < 0)
+        printf("open error: %s\n", strerror(errno));
+    if (myreadv(fd, iovec2, 2) != iovec[0].iov_len + iovec[1].iov_len)
+        printf("readv error: %s\n", strerror(errno));
+
+    // 挨个char打印是因为缓冲区有没有哨兵，而且这又不一定是char类型，00可能只是一个
+    // 值的01 00 00 00(小段int 1)的部分而已，我这里是知道我写的是char，所以用char读
+    // 罢了，又不一定是char，当然不一定是'\0'了，而且没有意义
+    size_t sz = sizeof(b3);
+    for (size_t i = 0; i < sz; ++i)
+    {
+        printf("%c", b3[i]);
+    }
+    sz = sizeof(b4);
+    for (size_t i = 0; i < sz; ++i)
+    {
+        printf("%c", b4[i]);
+    }
+    printf("\n");
 
     return 0;
 }
@@ -68,6 +70,28 @@ int main()
 
 ssize_t myreadv(int fd, const struct iovec *iovec, int count)
 {
+    ssize_t n;
+    ssize_t rest_buffer; // 单个缓冲区剩余的空间
+    ssize_t total_read = 0;
+
+    for (int i = 0; i < count; ++i)
+    {
+        rest_buffer = iovec[i].iov_len;
+        // 因为要考虑比如终端，比如网络I/O等等情况，不等于要求的数值也没读到头的情况外也不一定是错误
+        while ((n = read(fd, iovec[i].iov_base, rest_buffer)) > 0)
+        {
+            total_read += n;
+            rest_buffer -= n;
+            if (rest_buffer < 0)
+                break;
+        }
+        if (n < 0) // 返回错误
+            return -1;
+        if (n == 0) // 返回读完
+            return total_read;
+    }
+    // 返回缓冲区用完
+    return total_read;
 }
 
 ssize_t mywritev(int fd, const struct iovec *iovec, int count)
