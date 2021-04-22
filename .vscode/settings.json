@@ -2,6 +2,7 @@
     "files.associations": {
         "fcntl.h": "c",
         "tlpi_hdr.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "7_1.C": "cpp"
     }
 }
