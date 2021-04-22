@@ -42,7 +42,7 @@ int main(int argc, char *argv[])
     {
         if (is_append)
         {
-            tee_fd[fd_no++] = open(argv[i], O_CREAT | O_WRONLY | O_APPEND, 666);
+            tee_fd[fd_no++] = open(argv[i], O_CREAT | O_WRONLY | O_APPEND, 0666);
             if (tee_fd[fd_no - 1] < 0)
             {
                 exit(1);
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
         }
         else
         {
-            tee_fd[fd_no++] = open(argv[i], O_CREAT | O_WRONLY | O_TRUNC, 666);
+            tee_fd[fd_no++] = open(argv[i], O_CREAT | O_WRONLY | O_TRUNC, 0666);
             if (tee_fd[fd_no - 1] < 0)
             {
                 exit(1);

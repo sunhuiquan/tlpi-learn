@@ -96,7 +96,9 @@ https://www.zhihu.com/question/46552411/answer/130482168
 话说APUE也有这道题欸，能用fcntl果然舒服多了，虽然那个是直接用dup貌似更简单。。。
 
 ### 5.5
+当然共享，太简单不做了。
 
 ### 5.6
+书上印刷错误，是" world",所以是Gidday world
 
 
