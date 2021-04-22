@@ -101,4 +101,6 @@ https://www.zhihu.com/question/46552411/answer/130482168
 ### 5.6
 书上印刷错误，是" world",所以是Gidday world
 
+### 5.7
+open文件O_CREAT要用八进制或是直接用宏，我一直用十进制。。。服了我自己了。。。🤮
 
