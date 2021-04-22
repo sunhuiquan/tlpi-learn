@@ -33,29 +33,29 @@ int main()
 
     if ((fd = open("5_7file", O_CREAT | O_WRONLY | O_TRUNC, 0666)) < 0)
         printf("open error: %s\n", strerror(errno));
-    if (writev(fd, iovec, 2) != iovec[0].iov_len + iovec[1].iov_len)
+    if (mywritev(fd, iovec, 2) != iovec[0].iov_len + iovec[1].iov_len)
         printf("writev error: %s\n", strerror(errno));
     close(fd); // 刷新确保写入文件，不过open用同步选项加上lseek()也可以实现
-    if ((fd = open("5_7file", O_RDONLY | O_TRUNC)) < 0)
-        printf("open error: %s\n", strerror(errno));
-    if (readv(fd, iovec2, 2) != iovec2[0].iov_len + iovec2[1].iov_len)
-        printf("readv error: %s\n", strerror(errno));
+    // if ((fd = open("5_7file", O_RDONLY)) < 0)
+    //     printf("open error: %s\n", strerror(errno));
+    // if (readv(fd, iovec2, 2) != iovec2[0].iov_len + iovec2[1].iov_len)
+    //     printf("readv error: %s\n", strerror(errno));
 
-    memset(b3, 0, sizeof(b3));
-    memset(b4, 0, sizeof(b4));
-    // 挨个char打印是因为缓冲区有没有哨兵，而且这又不一定是char类型，00可能只是一个
-    // 值的01 00 00 00(小段int 1)的部分而已，我这里是知道我写的是char，所以用char读
-    // 罢了，又不一定是char，当然不一定是'\0'了，而且没有意义
-    size_t sz = sizeof(b3);
-    for (size_t i = 0; i < sz; ++i)
-    {
-        printf("%c", b3[i]);
-    }
-    sz = sizeof(b4);
-    for (size_t i = 0; i < sz; ++i)
-    {
-        printf("%c", b4[i]);
-    }
+    // memset(b3, 0, sizeof(b3));
+    // memset(b4, 0, sizeof(b4));
+    // // 挨个char打印是因为缓冲区有没有哨兵，而且这又不一定是char类型，00可能只是一个
+    // // 值的01 00 00 00(小段int 1)的部分而已，我这里是知道我写的是char，所以用char读
+    // // 罢了，又不一定是char，当然不一定是'\0'了，而且没有意义
+    // size_t sz = sizeof(b3);
+    // for (size_t i = 0; i < sz; ++i)
+    // {
+    //     printf("%c", b3[i]);
+    // }
+    // sz = sizeof(b4);
+    // for (size_t i = 0; i < sz; ++i)
+    // {
+    //     printf("%c", b4[i]);
+    // }
 
     return 0;
 }
@@ -72,4 +72,12 @@ ssize_t myreadv(int fd, const struct iovec *iovec, int count)
 
 ssize_t mywritev(int fd, const struct iovec *iovec, int count)
 {
+    ssize_t total_write = 0;
+    for (int i = 0; i < count; ++i)
+    {
+        if (write(fd, iovec[i].iov_base, iovec[i].iov_len) != iovec[i].iov_len)
+            return -1;
+        total_write += iovec[i].iov_len;
+    }
+    return total_write;
 }

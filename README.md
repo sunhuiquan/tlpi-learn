@@ -102,5 +102,6 @@ https://www.zhihu.com/question/46552411/answer/130482168
 书上印刷错误，是" world",所以是Gidday world
 
 ### 5.7
-open文件O_CREAT要用八进制或是直接用宏，我一直用十进制。。。服了我自己了。。。🤮
+1.open文件O_CREAT要用八进制或是直接用宏，我一直用十进制。。。服了我自己了。。。🤮
+2.别再误删了。。。不要直接用vscode在ssh下删除，因为真的找不回，最好alias rm变成移动到某个文件夹，因为误删真的太恐怖了，多commit，不用push
 
