@@ -52,11 +52,11 @@ int main()
     {
         printf("%c", b3[i]);
     }
-    sz = sizeof(b4);
-    for (size_t i = 0; i < sz; ++i)
-    {
-        printf("%c", b4[i]);
-    }
+    // sz = sizeof(b4);
+    // for (size_t i = 0; i < sz; ++i)
+    // {
+    //     printf("%c", b4[i]);
+    // }
     printf("\n");
 
     return 0;
