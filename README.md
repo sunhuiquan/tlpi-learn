@@ -144,3 +144,12 @@ https://www.zhihu.com/question/46552411/answer/130482168
 
 ### 8.2
 非常简单，[代码](./Exercise/8_2.c)。
+---
+
+## CH10 时间
+### 10.1
+times的单位是sysconf(_SC_CLK_TCK), (2^32 - x) / sysconf(_SC_CLK_TCK)
+clock的单位是CLOCKS_PER_SEC, (2^32 - x) / CLOCKS_PER_SEC
+---
+
+## CH11 系统限制和选项
