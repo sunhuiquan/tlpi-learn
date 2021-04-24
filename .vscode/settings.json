@@ -3,6 +3,7 @@
         "fcntl.h": "c",
         "tlpi_hdr.h": "c",
         "unistd.h": "c",
-        "7_1.C": "cpp"
+        "7_1.C": "cpp",
+        "stdlib.h": "c"
     }
 }
