@@ -176,7 +176,7 @@ int main()
 
 ## CH8 用户和组
 ### 8.1
-显然这个问题本身错了，作者也在勘误中修改了，因为这里的(long)getpwnam("name")->pw_uid是传递值直接给%l了，后面的又不会改变这个值。
+显然这个问题本身错了，作者也在勘误中修改了，因为这里的(long)getpwnam("name")->pw_uid是传递值直接给%ld了，后面的又不会改变这个值。
 ```
 拓展一下：
     当一个函数带有多个参数时，C/C++语言没有规定在函数调用时实参的求值顺序。而编译器根据对代码进行优化的需要自行规定对实参的求值顺序。
@@ -197,8 +197,9 @@ int main()
 
 ## CH10 时间
 ### 10.1
-times的单位是sysconf(_SC_CLK_TCK), (2^32 - x) / sysconf(_SC_CLK_TCK)
+times的单位是sysconf(_SC_CLK_TCK), (2^32 - x) / sysconf(_SC_CLK_TCK)<br>
 clock的单位是CLOCKS_PER_SEC, (2^32 - x) / CLOCKS_PER_SEC
+
 ---
 <br>
 <br>
