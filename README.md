@@ -1,6 +1,8 @@
 # TLPI_learn_note
 《LINUX/LINUX系统编程手册》学习记录和练习习题解答。
 
+[环境搭建](#环境搭建)
+
 ## 环境搭建
 ```
     wget https://man7.org/tlpi/code/download/tlpi-201025-dist.tar.gz
