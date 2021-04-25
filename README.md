@@ -199,6 +199,45 @@ int main()
 
 ## CH9 进程凭证
 ### 9.1
+   real  effective  saved  fs
+a. 1000  0          0      0
+b. 1000  2000       2000   2000
+c. 1000  2000       0      2000
+d. 1000  0          0      2000
+e. 1000  2000       3000   2000
+
+### 9.2
+不具有，因为特权只看有效用户ID(不过因为real是0很容易回到特权模式)
+
+### 9.3
+[my_initgroups.c](./Exercise/9_3.c)
+
+### 9.4
+```
+int old_eff = geteuid();
+（1）
+seteuid(getuid()); // 暂时有效切换到实际
+seteuid(old_eff);  // 恢复，因为保存UID的值允许
+// 注意多种实现完全都可以，另外setuid和getuid完全作用不同
+
+（2）
+setreuid(getuid(),getuid())     // 永久放弃，r不是-1(即使值没变)
+// 也会修改保存UID变成有效UID(当然是设置完后的新有效UID)
+```
+
+### 9.5
+```
+int old_eff = geteuid();
+（1）
+seteuid(getuid()); // 暂时有效切换到实际
+seteuid(old_eff);  // 恢复，因为保存UID的值允许
+//此时setuid不能了，因为是特权用户，会把保存UID也改了，所以最好一直用seteuid好用
+
+（2）
+setreuid(getuid(),getuid())     // 永久放弃，r不是-1(即使值没变)
+// 也会修改保存UID变成有效UID(当然是设置完后的新有效UID)
+```
+
 ---
 <br>
 <br>
