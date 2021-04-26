@@ -215,10 +215,10 @@ e. 1000  2000       3000   2000
 ### 9.3
 [my_initgroups.c](./Exercise/9_3.c)
 ```
-    使用set-root-user-ID，来让程序有权限读取密码文件
-    gcc 9_3.c -Wall
-    sudo chown root:water a.out
-    sudo chmod u+s a.out
+使用set-root-user-ID，来让程序有权限读取密码文件
+gcc 9_3.c -Wall
+sudo chown root:water a.out
+sudo chmod u+s a.out
 ```
 
 这个很有意思，因为get和setgroups()函数针对的是调用者ID(即属主即实际的ID)，然后initgroups还会指定用户名，所以说进程的切换也是挺有意思的，不过C风格字符串的操作真是让人头大。
