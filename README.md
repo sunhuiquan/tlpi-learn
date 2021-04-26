@@ -223,7 +223,6 @@ sudo chmod u+s a.out
 
 这个很有意思，因为get和setgroups()函数针对的是调用者ID(即属主即实际的ID)，然后initgroups还会指定用户名，所以说进程的切换也是挺有意思的，不过C风格字符串的操作真是让人头大。
 
-
 ### 9.4
 ```
 int old_eff = geteuid();
@@ -264,3 +263,24 @@ clock的单位是CLOCKS_PER_SEC, (2^32 - x) / CLOCKS_PER_SEC
 <br>
 
 ## CH11 系统限制和选项
+### 11.1
+孩子只有linux系统(ㄒoㄒ)
+
+### 11.2
+ext4 file system:
+```
+_PC_NAME_MAX, 255
+_PC_PATH_MAX, 4096
+_PC_PIPE_BUF, 4096
+```
+
+---
+<br>
+<br>
+
+## CH12 系统和进程信息
+### 12.1
+
+---
+<br>
+<br>
