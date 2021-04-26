@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
             "args": [
-                "water"
+                "root"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/Exercise", // 当前工作路径，绝对vscode相对路径的地方
