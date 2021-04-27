@@ -33,19 +33,20 @@ procnode *proc;
  */
 
 int handle_proc(const char *dir);
+void make_tree(uid_t ppid, int layer);
 
 int main(int argc, char *argv[])
 {
-    proc = (procnode *)malloc(sizeof(procnode) * pid_max);
-
     char dirname[MAXNAME];
     DIR *dirp;
     struct dirent *dir_entry;
+
     if (argc != 1)
     {
         printf("run it without any arguments.\n");
         exit(0);
     }
+    proc = (procnode *)malloc(sizeof(procnode) * pid_max);
 
     dirp = opendir("/proc");
     if (dirp == NULL)
@@ -63,8 +64,13 @@ int main(int argc, char *argv[])
         handle_proc(dirname);
     }
 
+    // for (int i = 0; i < procsz; ++i)
+    //     printf("name:%s|pid:%d|ppid:%d\n", proc[i].name, proc[i].pid, proc[i].ppid);
+
     for (int i = 0; i < procsz; ++i)
-        printf("name:%s|pid:%d|ppid:%d\n", proc[i].name, proc[i].pid, proc[i].ppid);
+        if (proc[i].pid == 1)
+            printf("%s(pid%d|ppid%d)\n", proc[i].name, proc[i].pid, proc[i].ppid);
+    make_tree(1, 1);
 
     return 0;
 }
@@ -123,4 +129,30 @@ int handle_proc(const char *dir)
 
     fclose(fp);
     return 0;
+}
+
+void make_tree(uid_t ppid, int layer)
+{
+    char empty[MAXLINE] = "               ";
+    char end_empty[MAXLINE] = "";
+    for (int i = 0; i < layer; ++i)
+        strcat(end_empty, empty);
+    int pos = strlen(end_empty);
+    end_empty[pos - 1] = '|';
+    end_empty[pos] = '-';
+    end_empty[pos + 1] = '>';
+    end_empty[pos + 2] = '\0';
+
+    // int done = 1;
+    for (int i = 0; i < procsz; ++i)
+    {
+        if (proc[i].ppid == ppid)
+        {
+            // done = 0;
+            printf("%s%s(%d|%d)\n", end_empty, proc[i].name, proc[i].pid, proc[i].ppid);
+            make_tree(proc[i].pid, layer + 1);
+        }
+    }
+    // if (done)
+    //     printf("\n");
 }
