@@ -11,7 +11,6 @@
 #define MAXNAME 256
 #define MAXLINE 4096
 
-void trim(char *s);
 int print_proc(const char *dir, uid_t uid);
 
 int main(int argc, char *argv[])
@@ -56,19 +55,6 @@ int main(int argc, char *argv[])
     }
 
     return 0;
-}
-
-void trim(char *s)
-{
-    char *p = s;
-    int l = strlen(p);
-
-    while (isspace(p[l - 1]))
-        p[--l] = 0;
-    while (*p && isspace(*p))
-        ++p, --l;
-
-    memmove(s, p, l + 1);
 }
 
 int print_proc(const char *dir, uid_t uid)
