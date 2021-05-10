@@ -1,30 +1,25 @@
 #include <pthread.h>
-#include <errno.h>
-#include <stdio.h>
-#include <tlpi_hdr.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include "tlpi_hdr.h"
 
-void *thread_func(void *arg)
+void *pthread_func(void *arg)
 {
+    printf("aaa");
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-    pthread_t thr;
+    pthread_t t1;
     int s;
 
-    s = pthread_create(&thr, NULL, thread_func, NULL);
+    s = pthread_create(&t1, NULL, pthread_func, NULL);
     if (s != 0)
-    {
         printf("pthread_create failed\n");
-        exit(1);
-    }
 
     s = pthread_join(pthread_self(), NULL);
     if (s != 0)
     {
         printf("%s\n", strerror(s));
+        errExitEN(s, "");
     }
 
     return 0;

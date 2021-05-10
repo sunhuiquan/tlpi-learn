@@ -342,7 +342,14 @@ _PC_PIPE_BUF, 4096
 ## CH29 线程：介绍
 
 ### 29.1
-会发生死锁，因为pthread_join(pthread_self(),NULL)会阻塞直到等待的线程退出，而这个等待的线程正是它本身。它本身需要执行完pthread_join才可以退出，而pthread_join解除阻塞又需要退出，显然矛盾，发生死锁。
+ERROR [EDEADLK/EDEADLOCK Resource deadlock avoided]这是在linux下发生的；当然其他UNIX系统可能会发生死锁（因为pthread_join(pthread_self(),NULL)会阻塞直到等待的线程退出，而这个等待的线程正是它本身。它本身需要执行完pthread_join才可以退出，而pthread_join解除阻塞又需要退出，显然矛盾，发生死锁。）
+```
+if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSIX thread id
+    pthread_join(tid, NULL); // 另外一定是要用pthread_equal来确保可移植性
+```
+
+### 29.2
+主线程退出后主线程栈的内存之后会被重用，而创建的线程使用的指针指向已经被重用的原主线程栈的内存空间，这种行为未定义，可能造成严重后果
 
 ### 29.2
 
