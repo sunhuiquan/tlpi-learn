@@ -4,6 +4,7 @@
         "tlpi_hdr.h": "c",
         "unistd.h": "c",
         "7_1.C": "cpp",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "error_functions.h": "c"
     }
 }

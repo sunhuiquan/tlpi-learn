@@ -8,7 +8,9 @@
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${fileDirname}/${fileBasenameNoExtension}",
+                "-ltlpi",
+                "-pthread"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
