@@ -374,3 +374,11 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 ---
 <br>
 <br>
+
+## CH33 线程：更多细节
+
+### 33.1
+
+---
+<br>
+<br>
