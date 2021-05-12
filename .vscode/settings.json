@@ -5,6 +5,8 @@
         "unistd.h": "c",
         "7_1.C": "cpp",
         "stdlib.h": "c",
-        "error_functions.h": "c"
+        "error_functions.h": "c",
+        "stdio.h": "c",
+        "sys_errlist.h": "c"
     }
 }
