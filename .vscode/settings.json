@@ -7,6 +7,18 @@
         "stdlib.h": "c",
         "error_functions.h": "c",
         "stdio.h": "c",
-        "sys_errlist.h": "c"
+        "sys_errlist.h": "c",
+        "cctype": "c",
+        "climits": "c",
+        "cmath": "c",
+        "cstdarg": "c",
+        "cstdio": "c",
+        "cstdlib": "c",
+        "type_traits": "c",
+        "limits": "c",
+        "*.tcc": "c",
+        "cstdbool": "c",
+        "cstdint": "c",
+        "typeinfo": "c"
     }
 }

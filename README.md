@@ -359,7 +359,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 ## CH30 线程：线程同步
 
 ### 30.1
-[代码](./Exercise/30_1.c)
+[代码](./Exercise/30_1.c)单纯熟练下API，随便写写
 
 ### 30.2
 
@@ -370,6 +370,10 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 ## CH31 线程：线程安全和每线程存储
 
 ### 31.1
+[代码](./Exercise/31_1.c)利用互斥量实现pthread_once
+    
+### 31.2
+[代码](./Exercise/31_2)使用线程特有数据，避免了多个线程共享传入的pathname内存导致线程不安全。(由于basenae函数和dirname的代码大体一样，所以就写了一个,不过使用线程局部数据简单代码简单多得多)
 
 ---
 <br>
@@ -378,6 +382,10 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 ## CH33 线程：更多细节
 
 ### 33.1
+
+
+### 33.2
+不会，因为信号发送目标是进程，而NPTL已经非常接近POSIX标准，因而各线程共享进程ID，因而某一个线程fork产生的子进程，发送SIGCHLD信号目标是父进程ID，而线程共享这个进程ID，因而可能发给该进程下的所有线程。
 
 ---
 <br>
