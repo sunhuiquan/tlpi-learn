@@ -9,9 +9,5 @@ pthread_t p[PTHREADS_NUM];
 int main()
 {
 
-    for (int i = 0; i < PTHREADS_NUM; ++i)
-    {
-    }
-
     return 0;
 }

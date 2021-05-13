@@ -32,6 +32,6 @@ struct tsbTree
 int tsb_initialize(ptsbTree tree);
 int tsb_add(ptsbTree tree, char *key, void *value);
 int tsb_delete(ptsbTree tree, char *key);
-Boolean tsb_lookup(char *key, void **value);
+Boolean tsb_lookup(ptsbTree tree, char *key, void **value);
 
 #endif
