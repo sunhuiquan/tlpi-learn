@@ -19,6 +19,7 @@
         "*.tcc": "c",
         "cstdbool": "c",
         "cstdint": "c",
-        "typeinfo": "c"
+        "typeinfo": "c",
+        "errno.h": "c"
     }
 }
