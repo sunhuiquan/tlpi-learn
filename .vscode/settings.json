@@ -22,6 +22,7 @@
         "typeinfo": "c",
         "errno.h": "c",
         "print_wait_status.h": "c",
-        "wait.h": "c"
+        "wait.h": "c",
+        "signal.h": "c"
     }
 }
