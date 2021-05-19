@@ -1,27 +1,15 @@
-/*************************************************************************\
-*                  Copyright (C) Michael Kerrisk, 2020.                   *
-*                                                                         *
-* This program is free software. You may use, modify, and redistribute it *
-* under the terms of the GNU General Public License as published by the   *
-* Free Software Foundation, either version 3 or (at your option) any      *
-* later version. This program is distributed without any warranty.  See   *
-* the file COPYING.gpl-v3 for details.                                    *
-\*************************************************************************/
-
-/* Listing 26-4 */
-
-/* make_zombie.c
-
-   Demonstrate how a child process becomes a zombie in the interval between
-   the time it exits, and the time its parent performs a wait (or exits, at
-   which time it is adopted by init(8), which does a wait, thus releasing
-   the zombie).
-*/
 #include <signal.h>
 #include <libgen.h> /* For basename() declaration */
 #include "tlpi_hdr.h"
 
 #define CMD_SIZE 200
+
+int get_sigchld = 0;
+
+void sigchld_handler(int sig)
+{
+    get_sigchld = 1;
+}
 
 int main(int argc, char *argv[])
 {
@@ -32,17 +20,27 @@ int main(int argc, char *argv[])
 
     printf("Parent PID=%ld\n", (long)getpid());
 
+    struct sigaction sa;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+    sa.sa_handler = sigchld_handler;
+    if (sigaction(SIGCHLD, &sa, NULL) == -1)
+        errExit("sigaction");
+
     switch (childPid = fork())
     {
     case -1:
         errExit("fork");
 
     case 0: /* Child: immediately exits to become zombie */
+        signal(SIGCHLD, SIG_DFL);
         printf("Child (PID=%ld) exiting\n", (long)getpid());
         _exit(EXIT_SUCCESS);
 
-    default:      /* Parent */
-        sleep(3); /* Give child a chance to start and exit */
+    default:                 /* Parent */
+        while (!get_sigchld) // To ignore the other signals
+            pause();
+
         snprintf(cmd, CMD_SIZE, "ps | grep %s", basename(argv[0]));
         system(cmd); /* View zombie child */
 
