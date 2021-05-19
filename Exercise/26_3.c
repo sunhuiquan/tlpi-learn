@@ -1,36 +1,46 @@
-/*************************************************************************\
-*                  Copyright (C) Michael Kerrisk, 2020.                   *
-*                                                                         *
-* This program is free software. You may use, modify, and redistribute it *
-* under the terms of the GNU General Public License as published by the   *
-* Free Software Foundation, either version 3 or (at your option) any      *
-* later version. This program is distributed without any warranty.  See   *
-* the file COPYING.gpl-v3 for details.                                    *
-\*************************************************************************/
-
-/* Listing 26-3 */
-
-/* child_status.c
-
-   Demonstrate the use of wait() and the W* macros for analyzing the child
-   status returned by wait()
-
-   Usage: child_status [exit-status]
-
-   If "exit-status" is supplied, then the child immediately exits with this
-   status. If no command-line argument is supplied then the child loops waiting
-   for signals that either cause it to stop or to terminate - both conditions
-   can be detected and differentiated by the parent. The parent process
-   repeatedly waits on the child until it detects that the child either exited
-   normally or was killed by a signal.
-*/
 #include <sys/wait.h>
-#include "print_wait_status.h" /* Declares printWaitStatus() */
 #include "tlpi_hdr.h"
+
+void printWaitidStatus(const char *msg, const siginfo_t *info)
+{
+    if (msg != NULL)
+        printf("%s", msg);
+
+    int status = info->si_status; // It's a normal value, not the same as wait's status format
+
+    if (info->si_code == CLD_EXITED)
+    {
+        printf("child exited, status=%d\n", status);
+    }
+    else if (info->si_code == CLD_KILLED)
+    {
+        printf("child killed by signal %d\n",
+               status - 127);
+    }
+    else if (info->si_code == CLD_STOPPED)
+    {
+        printf("child stopped by signal %d (%s)\n",
+               status, strsignal(status));
+
+#ifdef WIFCONTINUED /* SUSv3 has this, but older Linux versions and \
+                   some other UNIX implementations don't */
+    }
+    else if (info->si_code == CLD_CONTINUED)
+    {
+        printf("child continued\n");
+#endif
+    }
+    else
+    { /* Should never happen */
+        printf("what happened to this child? (status=%x)\n",
+               (unsigned int)status);
+    }
+}
 
 int main(int argc, char *argv[])
 {
-    int status;
+    siginfo_t info;
+    info.si_signo = SIGCHLD;
     pid_t childPid;
 
     if (argc > 1 && strcmp(argv[1], "--help") == 0)
@@ -55,22 +65,17 @@ int main(int argc, char *argv[])
                            either exits or is terminated by a signal */
         for (;;)
         {
-            childPid = waitpid(-1, &status, WUNTRACED
-#ifdef WCONTINUED /* Not present on older versions of Linux */
-                                                | WCONTINUED
+            childPid = waitid(P_ALL, 0, &info, WEXITED | WSTOPPED
+#ifdef WCONTINUED
+                                                   | WCONTINUED
 #endif
             );
             if (childPid == -1)
                 errExit("waitpid");
 
-            /* Print status in hex, and as separate decimal bytes */
+            printf("child exited with %d\n", info.si_status);
 
-            printf("waitpid() returned: PID=%ld; status=0x%04x (%d,%d)\n",
-                   (long)childPid,
-                   (unsigned int)status, status >> 8, status & 0xff);
-            printWaitStatus(NULL, status);
-
-            if (WIFEXITED(status) || WIFSIGNALED(status))
+            if (info.si_code == CLD_EXITED || info.si_code == CLD_KILLED)
                 exit(EXIT_SUCCESS);
         }
     }
