@@ -377,9 +377,7 @@ SA_NODEFER: [代码](./Exercise/20_3b.c)<br>
 
 原理图：<br>
 sa_flag=0情况<br> ![IMG](./IMG/7.png)<br>
-SANODEFER情况<br> ![IMG](./IMG/8.png)<br>
-
-
+SA_NODEFER情况<br> ![IMG](./IMG/8.png)<br>
 
 ### 20.4 to do
 [代码](./Exercise/20_4.c)
