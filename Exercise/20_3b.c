@@ -13,7 +13,8 @@ int main()
     struct sigaction act;
 
     sigemptyset(&act.sa_mask);
-    act.sa_flags = 0;
+    act.sa_flags = SA_NODEFER;
+    // act.sa_flags = 0;
     act.sa_handler = handler;
     if (sigaction(SIGTERM, &act, NULL) == -1)
         errExit("sigaction");
