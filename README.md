@@ -367,8 +367,21 @@ _PC_PIPE_BUF, 4096
 [代码](./Exercise/20_2.c)
 
 ### 20.3
+SA_RESETHAND:
+[代码](./Exercise/20_3.c)注意下SA_RESETHAND调用handler前(调用前的意思是改完了还会调用一次handler)改为SIG_DEF，因而只调用一次handler，下一次恢复了SIG_DEF；但是对于SIG_IGN是保持不变，不会改为SIG_DEF
 
-### 20.4
+SA_NODEFER:<br>
+这个是SA_NODEFER使得可以在信号处理函数中递归调用hander自身，执行完返回上一个中断点(在上个调用hander的过程中中断的地方)，恢复执行![IMG](./IMG/5.png)<br>
+![IMG](./IMG/6.png)<br>
+
+原理图：<br>
+sa_flag=0 ![IMG](./IMG/7.png)<br>
+SANODEFER ![IMG](./IMG/8.png)<br>
+
+
+
+### 20.4 to do
+[代码](./Exercise/20_4.c)
 
 ---
 <br>
