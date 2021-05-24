@@ -397,6 +397,15 @@ SA_NODEFER情况<br> ![IMG](./IMG/8.png)<br>
 
 ## CH22 信号：高级特性
 
+### 22.1
+[代码](./Exercise/22_1.c) 注意：只有信号处理函数调用(和终止)才能中断一个系统调用(前提是这个系统调用可以被中断)，其他如ignore、stop、cont不会中断(eg: pause()后kill-STOP和kill-CONT不会中断pause，pause会继续等待被下一个信号中断)
+
+### 22.2
+
+### 22.3
+
+### 22.4    
+
 ---
 <br>
 <br>
