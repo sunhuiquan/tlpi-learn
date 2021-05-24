@@ -401,6 +401,7 @@ SA_NODEFER情况<br> ![IMG](./IMG/8.png)<br>
 [代码](./Exercise/22_1.c) 注意：只有信号处理函数调用(和终止)才能中断一个系统调用(前提是这个系统调用可以被中断)，其他如ignore、stop、cont不会中断(eg: pause()后kill-STOP和kill-CONT不会中断pause，pause会继续等待被下一个信号中断)
 
 ### 22.2
+[代码](./Exercise/22_2.c) 标准信号在实时信号前，标准信号顺序非从小到大，实时信号保持从小到大的先后顺序。
 
 ### 22.3
 
