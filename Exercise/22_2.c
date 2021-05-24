@@ -28,20 +28,20 @@ int main()
                 errExit("sigaction");
         }
 
-    // for (int i = SIGRTMIN; i <= SIGRTMAX; ++i)
-    //     if (i != SIGSTOP && i != SIGKILL)
-    //     {
-    //         if (sigaction(i, &act, NULL) == -1)
-    //             errExit("sigaction");
-    //     }
+    for (int i = SIGRTMIN; i <= SIGRTMAX; ++i)
+        if (i != SIGSTOP && i != SIGKILL)
+        {
+            if (sigaction(i, &act, NULL) == -1)
+                errExit("sigaction");
+        }
 
     for (int i = 1; i < 32; ++i)
         if (i != SIGSTOP && i != SIGKILL)
             raise(i);
 
-    // for (int i = SIGRTMIN; i <= SIGRTMAX; ++i)
-    //     if (i != SIGSTOP && i != SIGKILL)
-    //         raise(i);
+    for (int i = SIGRTMIN; i <= SIGRTMAX; ++i)
+        if (i != SIGSTOP && i != SIGKILL)
+            raise(i);
 
     sigemptyset(&empty_set);
     if (sigprocmask(SIG_SETMASK, &empty_set, NULL) == -1)
