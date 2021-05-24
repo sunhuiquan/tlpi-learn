@@ -407,7 +407,8 @@ SA_NODEFER情况<br> ![IMG](./IMG/8.png)<br>
 [代码](./Exercise/22_3.c)<br>
 ![IMG](./IMG/9.png)<br>
 
-### 22.4    
+### 22.4
+[代码](./Exercise/22_4.c) System V signal API 已废止    
 
 ---
 <br>
