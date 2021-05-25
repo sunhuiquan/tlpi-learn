@@ -24,6 +24,7 @@
         "print_wait_status.h": "c",
         "wait.h": "c",
         "signal.h": "c",
-        "signal_functions.h": "c"
+        "signal_functions.h": "c",
+        "resource.h": "c"
     }
 }
