@@ -33,7 +33,8 @@
 + [CH30 线程：线程同步](#CH30-线程线程同步)
 + [CH31 线程：线程安全和每线程存储](#CH31-线程线程安全和每线程存储)
 + [CH33 线程：更多细节](#CH33-线程更多细节)
-
+---
++ [CH34 进程组、会话和作业控制](#CH34-进程组、会话和作业控制)
 
 ## 环境搭建
 ```
@@ -572,6 +573,38 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 33.2
 不会，因为信号发送目标是进程，而NPTL已经非常接近POSIX标准，因而各线程共享进程ID，因而某一个线程fork产生的子进程，发送SIGCHLD信号目标是父进程ID，而线程共享这个进程ID，因而可能发给该进程下的所有线程。
+
+---
+<br>
+<br>
+
+## CH34 进程组、会话和作业控制
+
+---
+<br>
+<br>
+
+## CH36 进程资源
+注意:
+    RUSAGE_CHILDREN
+    Return resource usage statistics for all children of the
+    calling process that have terminated and been waited for.
+    These statistics will include the resources used by
+    grandchildren, and further removed descendants, if all of
+    the intervening descendants waited on their terminated
+    children.
+    manpage上写的多清楚，书上一开始写的有点误导(虽然后面仔细说明了)
+
+### 36.1
+![IMG](./IMG/10.png)<br>
+[代码](./Exercise/36_1.c)<br>
+可以非常明显地看出子进程的资源使用信息，是在它被父进程wait调用的时候更新的，因而无论是正在运行还是终止都不会记录信息，只有被wait后才有(SIG_IGN处理SIGCHLD也不会有信息)。
+
+### 36.2
+[代码](./Exercise/36_2.c)
+
+### 36.3
+
 
 ---
 <br>
