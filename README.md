@@ -606,7 +606,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 36.3
 [代码](./Exercise/36_3.c)<br>
-![IMG](./IMG/11.pug)<br>
+![IMG](./IMG/11.png)<br>
 可以发现超出文件大小软限制的情况下write并没有报错，errno也没有设置出错，但是写入的大小超出RLIMIT_FSIZE的部分被截断舍去。
 
 ---
