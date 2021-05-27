@@ -616,6 +616,11 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ## CH43 进程间通信简介
 
+### 43.1
+[代码](./Exercise/43_1.c) gettimeofday做差提供高精度的时间差，用于计时挺好用的。
+
+### 43.2
+
 ---
 <br>
 <br>
