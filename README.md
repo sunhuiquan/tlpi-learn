@@ -36,6 +36,10 @@
 + [CH34 进程组、会话和作业控制](#CH34-进程组、会话和作业控制)
 + [CH43 进程间通信简介](#CH43-进程间通信简介)
 + [CH44 管道和FIFO](#CH44-管道和FIFO)
++ [CH45 System V IPC介绍](#CH45-SystemVIPC介绍)
++ [CH46 System V 消息队列](#CH46-SystemV消息队列)
++ [CH47 System V 信号量](#CH47-信号量)
++ [CH48 System V 共享内存](#CH48-共享内存)
 
 ## 环境搭建
 ```
@@ -620,6 +624,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 [代码](./Exercise/43_1.c) gettimeofday做差提供高精度的时间差，用于计时挺好用的。
 
 ### 43.2
+to do
 
 ---
 <br>
