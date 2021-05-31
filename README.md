@@ -651,13 +651,16 @@ to do
 [代码](./Exercise/44_6.c)
 
 ### 44.7
-[代码](./Exercise/44_7.c)
+[代码](./Exercise/44_7.c) 这个简单，舒服了
 
 ---
 <br>
 <br>
 
 ## CH45 System V IPC介绍
+
+### 45.1
+[代码](./Exercise/45_1.c) 非常容易，顺便复习下stat写法
 
 ---
 <br>
