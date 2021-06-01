@@ -1,6 +1,12 @@
 #include <signal.h>
 #include "fifo_seqnum.h"
 
+void handler(int sig)
+{
+    unlink(SERVER_FIFO);
+    exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char *argv[])
 {
     int serverFd, dummyFd, clientFd, save_fd;
@@ -8,8 +14,22 @@ int main(int argc, char *argv[])
     struct request req;
     struct response resp;
     int seqNum; /* This is our "service" */
+    struct sigaction sigint_act, sigterm_act;
 
-    /*****/
+    sigemptyset(&sigint_act.sa_mask);
+    sigaddset(&sigint_act.sa_mask, SIGTERM);
+    sigint_act.sa_flags = 0;
+    sigint_act.sa_handler = handler;
+    if (sigaction(SIGINT, &sigint_act, NULL) == -1)
+        errExit("sigaction");
+
+    sigemptyset(&sigterm_act.sa_mask);
+    sigaddset(&sigterm_act.sa_mask, SIGINT);
+    sigterm_act.sa_flags = 0;
+    sigterm_act.sa_handler = handler;
+    if (sigaction(SIGTERM, &sigterm_act, NULL) == -1)
+        errExit("sigaction");
+
     if ((save_fd = open(SAVE_FILE_PATH, O_RDWR | O_SYNC)) == -1)
     {
         if (errno == ENOENT)
@@ -27,7 +47,6 @@ int main(int argc, char *argv[])
     }
     else if (read(save_fd, &seqNum, sizeof(seqNum)) != sizeof(seqNum))
         errExit("read");
-    /*****/
 
     /* Create well-known FIFO, and open it for reading */
     umask(0); /* So we get the permissions we want */

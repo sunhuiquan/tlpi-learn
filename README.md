@@ -639,16 +639,36 @@ to do
 [代码](./Exercise/44_2.c) 在库函数里面用了全局变量来处理该等待哪个子进程，static用了
 
 ### 44.3
-[代码](./Exercise/44_3.c)
+[代码](./Exercise/44_3456/44_3.c) 把代码放到fifo_seqnum_server.c后，make all生成可执行文件。
 
 ### 44.4
-[代码](./Exercise/44_4.c)
+[代码](./Exercise/44_3456/44_4.c) 复习一下unlink，unlink的作用是立即删除硬链接(文件表项)，并减少inode(文件本身)的引用计数(只有硬链接算，软链接不是)，当inode引用计数为0时真正删除文件本身。但是注意即使引用计数为0，但如果仍有打开文件描述符(本质是通过open系统调用)指向inode项，那么先不删除inode(因为删除inode之后打开描述符就什么也干不了)，这样不会影响已经打开的描述符，直到所有打开描述符关闭后，inode才被删除。(ps. inode(文件本身)的引用计数是硬链接)
+
+另外因为SIGINT和SIGTERM两个信号用了同一个信号处理函数，为了避免一个信号中断调用handler的时候又被另一个信号中断调用同一个handler造成一些困扰，最典型的是造成竞争条件(虽然handler本身要求最好是可重入，这种情况不受影响)，或者因为要退出并做一些清理工作，会造成退出前做了多次清理工作的bug，因此为了避免这个当一个信号中断的时候要把掩码加上别的共用同一个handler的信号。
+
+```
+unlink(2) — Linux manual page:
+ unlink() deletes a name from the filesystem.  If that name was
+       the last link to a file and no processes have the file open, the
+       file is deleted and the space it was using is made available for
+       reuse.
+
+       If the name was the last link to a file but any processes still
+       have the file open, the file will remain in existence until the
+       last file descriptor referring to it is closed.
+
+       If the name referred to a symbolic link, the link is removed.
+
+       If the name referred to a socket, FIFO, or device, the name for
+       it is removed but processes which have the object open may
+       continue to use it. (这种情况下和对普通的file操作没区别)
+```
 
 ### 44.5
-[代码](./Exercise/44_5.c)
+[代码](./Exercise/44_3456/44_5.c)
 
 ### 44.6
-[代码](./Exercise/44_6.c)
+[代码](./Exercise/44_3456/44_6.c)
 
 ### 44.7
 [代码](./Exercise/44_7.c) 这个简单，舒服了
