@@ -10,9 +10,8 @@ removeFifo(void)
 
 int main(int argc, char *argv[])
 {
-    int serverFd, clientFd;
+    int serverFd;
     struct request req;
-    struct response resp;
 
     if (argc > 1 && strcmp(argv[1], "--help") == 0)
         usageErr("%s [seq-len]\n", argv[0]);
@@ -41,14 +40,8 @@ int main(int argc, char *argv[])
         sizeof(struct request))
         fatal("Can't write to server");
 
-    /* Open our FIFO, read and display response */
-    clientFd = open(clientFifo, O_RDONLY);
-    if (clientFd == -1)
-        errExit("open %s", clientFifo);
-
-    if (read(clientFd, &resp, sizeof(struct response)) != sizeof(struct response))
-        fatal("Can't read response from server");
-
-    printf("%d\n", resp.seqNum);
+    // attack
+    sleep(100);
+    // 避免删除fifo导致open失败摆脱阻塞，之所以不取消unlink是因为懒得之后手动删文件
     exit(EXIT_SUCCESS);
 }

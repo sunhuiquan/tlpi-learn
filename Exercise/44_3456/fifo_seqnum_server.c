@@ -79,7 +79,18 @@ int main(int argc, char *argv[])
 
         snprintf(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE,
                  (long)req.pid);
-        clientFd = open(clientFifo, O_WRONLY);
+        // clientFd = open(clientFifo, O_WRONLY);
+
+        // 使用轮询，正常情况下即使server在client open FIFO前打开，也会在20000次以内
+        // client open FIFO，阻塞攻击的情况下，20000次仍失败则处理下一个请求,通过打印
+        // 基本可以肯定在20000时几乎没问题,这样超出20000我们会退出后处理下一个请求
+        for (int i = 0; i < 20000; ++i)
+        {
+            if ((clientFd = open(clientFifo, O_WRONLY | O_NONBLOCK)) == -1 && errno == ENXIO)
+                continue;
+            printf("i: %d\n", i);
+            break;
+        }
         if (clientFd == -1)
         { /* Open failed, give up on client */
             errMsg("open %s", clientFifo);

@@ -665,13 +665,17 @@ unlink(2) — Linux manual page:
 ```
 
 ### 44.5
-[代码](./Exercise/44_3456/44_5.c)
+在服务器关闭和重新打开server的FIFO之间,如果client写打开FIFO会错误，导致请求失败。
 
 ### 44.6
 [代码](./Exercise/44_3456/44_6.c)
+[阻塞攻击代码](./Exercise/44_3456/fifo_seqnum_bad_client.c)
+ 使用轮询，正常情况下即使server在client open FIFO前打开，也会在20000次以内client open FIFO，阻塞攻击的情况下，20000次仍失败则处理下一个请求,通过打印基本可以肯定在20000时几乎没问题,这样超出20000我们认为是攻击会退出后处理下一个请求(可以设大一点因为打开成功后就break实际上不会跑这么多次，对于阻塞攻击多给些时间来确保也是正确的)
 
 ### 44.7
 [代码](./Exercise/44_7.c) 这个简单，舒服了
+
+note: 只有exit()和从main中return调用退出注册函数，被信号异常终止和_exit()不调用。
 
 ---
 <br>
