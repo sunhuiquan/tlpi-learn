@@ -25,6 +25,7 @@
         "wait.h": "c",
         "signal.h": "c",
         "signal_functions.h": "c",
-        "resource.h": "c"
+        "resource.h": "c",
+        "ipc.h": "c"
     }
 }

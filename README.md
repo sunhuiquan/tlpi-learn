@@ -36,10 +36,10 @@
 + [CH34 进程组、会话和作业控制](#CH34-进程组、会话和作业控制)
 + [CH43 进程间通信简介](#CH43-进程间通信简介)
 + [CH44 管道和FIFO](#CH44-管道和FIFO)
-+ [CH45 System V IPC介绍](#CH45-SystemVIPC介绍)
-+ [CH46 System V 消息队列](#CH46-SystemV消息队列)
-+ [CH47 System V 信号量](#CH47-信号量)
-+ [CH48 System V 共享内存](#CH48-共享内存)
++ [CH45 System V IPC介绍](#CH45-System-V-IPC-介绍)
++ [CH46 System V 消息队列](#CH46-System-V-消息队列)
++ [CH47 System V 信号量](#CH47-System-V-信号量)
++ [CH48 System V 共享内存](#CH48-System-V-共享内存)
 
 ## 环境搭建
 ```
@@ -661,6 +661,12 @@ to do
 
 ### 45.1
 [代码](./Exercise/45_1.c) 非常容易，顺便复习下stat写法
+
+### 45_2
+[代码](./Exercise/45_2.c) 和练习一没啥区别
+
+### 45_3
+这个不知道怎么获得内核数据结构，to do
 
 ---
 <br>
