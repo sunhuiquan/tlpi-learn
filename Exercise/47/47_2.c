@@ -55,6 +55,9 @@ int main(int argc, char *argv[])
 
         printf("[%s %ld] Parent got work\n", currTime("%T"), (long)getpid());
 
+        if (semctl(semid, 0, IPC_RMID) == -1)
+            errExit("semctl RMID");
+
         exit(EXIT_SUCCESS);
     }
 }

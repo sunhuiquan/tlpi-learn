@@ -28,6 +28,8 @@
         "resource.h": "c",
         "ipc.h": "c",
         "semun.h": "c",
-        "curr_time.h": "c"
+        "curr_time.h": "c",
+        "types.h": "c",
+        "stat.h": "c"
     }
 }
