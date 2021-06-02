@@ -690,7 +690,8 @@ note: 只有exit()和从main中return调用退出注册函数，被信号异常�
 [代码](./Exercise/45_2.c) 和练习一没啥区别
 
 ### 45_3
-这个不知道怎么获得内核数据结构，to do
+首先注意一下如果是IPC_PRIVATE作为key创建的标识符显示是0.
+[代码](./Exercise/45_3.c) 公式符合，但是seq字段的行为不同，是因为linux内核升级改变了计算的方式，吐了，我还以为我错了。
 
 ---
 <br>
@@ -698,6 +699,11 @@ note: 只有exit()和从main中return调用退出注册函数，被信号异常�
 
 
 ## CH46 System V 消息队列
+
+注意：自定义类型中long之后可能出现字节对齐导致的padding bytes，这种情况下通过offsetof或者整个sizeof - sizeof(long)可以得到真实的剩余部分的所占用空间，在自定义消息类型的mtext的大小十分关键。
+[举例](./Exercise/46_0.c)
+
+### 46.1
 
 ---
 <br>
