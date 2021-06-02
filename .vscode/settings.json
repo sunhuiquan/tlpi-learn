@@ -31,6 +31,7 @@
         "curr_time.h": "c",
         "types.h": "c",
         "stat.h": "c",
-        "binary_sems.h": "c"
+        "binary_sems.h": "c",
+        "sem.h": "c"
     }
 }
