@@ -27,6 +27,7 @@
         "signal_functions.h": "c",
         "resource.h": "c",
         "ipc.h": "c",
-        "semun.h": "c"
+        "semun.h": "c",
+        "curr_time.h": "c"
     }
 }
