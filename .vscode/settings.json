@@ -26,6 +26,7 @@
         "signal.h": "c",
         "signal_functions.h": "c",
         "resource.h": "c",
-        "ipc.h": "c"
+        "ipc.h": "c",
+        "semun.h": "c"
     }
 }
