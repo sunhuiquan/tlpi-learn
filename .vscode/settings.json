@@ -30,6 +30,7 @@
         "semun.h": "c",
         "curr_time.h": "c",
         "types.h": "c",
-        "stat.h": "c"
+        "stat.h": "c",
+        "binary_sems.h": "c"
     }
 }
