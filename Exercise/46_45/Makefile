@@ -1,7 +1,7 @@
 TLPI_LIB = /usr/local/lib/libtlpi.a
-GEN_EXE = fifo_seqnum_client fifo_seqnum_server 
+GEN_EXE = svmsg_file_client svmsg_file_server
 
-fifo_seqnum_client.o fifo_seqnum_server.o : fifo_seqnum.h
+svmsg_file_client.o svmsg_file_server.o : svmsg_file.h
 
 all: ${GEN_EXE}
 
