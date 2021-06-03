@@ -6,11 +6,6 @@
 
 #define MSG_MODE ((S_IWUSR | S_IRUSR | S_IWGRP | S_IRGRP))
 
-void exit_unlink()
-{
-    unlink(SERVER_FILE);
-}
-
 int main()
 {
     int server_msqid, fd;
@@ -18,20 +13,14 @@ int main()
     struct ResponseMsg response_msg;
     int seq_num = 0;
 
-    /********/
-    printf("8_%d 4_%d\n", REQUSET_SIZE, RESPONSE_SIZE);
-    /********/
-
     if ((server_msqid = msgget(IPC_PRIVATE, MSG_MODE)) == -1)
         errExit("msgget");
-    if ((fd = open(SERVER_FILE, O_CREAT | O_EXCL | O_WRONLY)) == -1)
+    if ((fd = open(SERVER_FILE, O_CREAT | O_WRONLY | O_TRUNC, 0666)) == -1)
         errExit("open");
     if (write(fd, &server_msqid, sizeof(server_msqid)) != sizeof(server_msqid))
         errExit("write");
     if (close(fd) == -1)
         errExit("close");
-    if (atexit(exit_unlink) == -1)
-        errExit("atexit");
 
     for (;;)
     {
