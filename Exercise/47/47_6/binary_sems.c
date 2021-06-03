@@ -54,3 +54,18 @@ releaseSem(int semId, int semNum)
 
     return semop(semId, &sops, 1);
 }
+
+int reserveSemNB(int semId, int semNum)
+{
+    struct sembuf sops;
+
+    sops.sem_num = semNum;
+    sops.sem_op = -1;
+    sops.sem_flg = bsUseSemUndo ? SEM_UNDO : 0;
+    sops.sem_flg = sops.sem_flg | IPC_NOWAIT;
+
+    if (semop(semId, &sops, 1) == -1)
+        return -1;
+
+    return 0;
+}

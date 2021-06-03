@@ -2,18 +2,18 @@
 #include <sys/sem.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include "binary_sems.h"
+#include "binary_fifo.h"
 
 int main()
 {
-    int semid;
     pid_t pid;
+    char path[1024];
 
-    if ((semid = semget(IPC_PRIVATE, 1, S_IWUSR | S_IRUSR)) == -1)
-        errExit("semid");
-    if (initSemInUse(semid, 0) == -1)
-        errExit("initSemInUse");
+    sprintf(path, "/tmp/fifo-%d", getpid());
+    if (mkfifo(path, 0666) == -1)
+        errExit("mkfifo");
 
+    int rfd;
     switch (pid = fork())
     {
     case -1:
@@ -24,30 +24,36 @@ int main()
         printf("child holds resouce at first\n");
         sleep(2);
         printf("child release resouce and wait get resourse again\n");
-        if (releaseSem(semid, 0) == -1)
-            errExit("releaseSem");
+        if (release(path) == -1)
+            errExit("release");
 
         sleep(1);
-        if (reserveSemNB(semid, 0) == -1)
-            if (errno == EAGAIN)
+        printf("a\n");
+        if (reserveNB(path) == -1)
+        {
+            if (errno == ENXIO)
                 printf("try no block fail and then block wait\n");
+            else
+                errExit("reserveNB");
+        }
 
-        if (reserveSem(semid, 0) == -1)
-            errExit("reserveSem");
+        if (reserve(path) == -1)
+            errExit("reserve");
         sleep(2);
         printf("child hold again\n");
         _exit(EXIT_SUCCESS);
     }
 
     // parent
-    if (reserveSem(semid, 0) == -1)
-        errExit("reserveSem");
+    if (reserve(path) == -1)
+        errExit("reserve");
     printf("parent get resource\n");
 
     sleep(2);
     printf("parent release resouce\n");
-    if (releaseSem(semid, 0) == -1)
-        errExit("reserveSem");
+    if (release(path) == -1)
+        errExit("reserve");
 
+    unlink(path);
     return 0;
 }
