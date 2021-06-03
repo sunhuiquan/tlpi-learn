@@ -1,10 +1,12 @@
 #ifndef BINARY_FIFO_H
 #define BINARY_FIFO_H
 
-int reserve(const char *fifo);
+int init(const char *fifo, int *rfd, int *wfd);
 
-int release(const char *fifo);
+int reserve(int rfd);
 
-int reserveNB(const char *fifo);
+int reserveNB(int rfd);
+
+int release(int wfd);
 
 #endif
