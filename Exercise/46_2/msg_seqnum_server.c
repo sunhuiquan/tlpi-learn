@@ -1,61 +1,51 @@
-#include <signal.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <tlpi_hdr.h>
 #include "msg_seqnum.h"
 
-int main(int argc, char *argv[])
+#define MSG_MODE ((S_IWUSR | S_IRUSR | S_IWGRP | S_IRGRP))
+
+void exit_unlink()
 {
-    int serverFd, dummyFd, clientFd;
-    char clientFifo[CLIENT_FIFO_NAME_LEN];
-    struct request req;
-    struct response resp;
-    int seqNum = 0; /* This is our "service" */
+    unlink(SERVER_FILE);
+}
 
-    /* Create well-known FIFO, and open it for reading */
+int main()
+{
+    int server_msqid, fd;
+    struct RequestMsg request_msg;
+    struct ResponseMsg response_msg;
+    int seq_num = 0;
 
-    umask(0); /* So we get the permissions we want */
-    if (mkfifo(SERVER_FIFO, S_IRUSR | S_IWUSR | S_IWGRP) == -1 && errno != EEXIST)
-        errExit("mkfifo %s", SERVER_FIFO);
-    serverFd = open(SERVER_FIFO, O_RDONLY);
-    if (serverFd == -1)
-        errExit("open %s", SERVER_FIFO);
+    /********/
+    printf("8_%d 4_%d\n", REQUSET_SIZE, RESPONSE_SIZE);
+    /********/
 
-    /* Open an extra write descriptor, so that we never see EOF */
-
-    dummyFd = open(SERVER_FIFO, O_WRONLY);
-    if (dummyFd == -1)
-        errExit("open %s", SERVER_FIFO);
-
-    /* Let's find out about broken client pipe via failed write() */
-
-    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-        errExit("signal");
+    if ((server_msqid = msgget(IPC_PRIVATE, MSG_MODE)) == -1)
+        errExit("msgget");
+    if ((fd = open(SERVER_FILE, O_CREAT | O_EXCL | O_WRONLY)) == -1)
+        errExit("open");
+    if (write(fd, &server_msqid, sizeof(server_msqid)) != sizeof(server_msqid))
+        errExit("write");
+    if (close(fd) == -1)
+        errExit("close");
+    if (atexit(exit_unlink) == -1)
+        errExit("atexit");
 
     for (;;)
-    { /* Read requests and send responses */
-        if (read(serverFd, &req, sizeof(struct request)) != sizeof(struct request))
-        {
-            fprintf(stderr, "Error reading request; discarding\n");
-            continue; /* Either partial read or error */
-        }
+    {
+        if (msgrcv(server_msqid, &request_msg, REQUSET_SIZE, 1, 0) == -1)
+            errExit("msgrcv");
 
-        /* Open client FIFO (previously created by client) */
+        response_msg.mtype = (long)request_msg.pid;
+        response_msg.seqnum = seq_num;
+        // we should send the actual bytes we use in msgsnd
+        if (msgsnd(server_msqid, &response_msg, RESPONSE_SIZE, 0) == -1)
+            errExit("msgsnd");
 
-        snprintf(clientFifo, CLIENT_FIFO_NAME_LEN, CLIENT_FIFO_TEMPLATE,
-                 (long)req.pid);
-        clientFd = open(clientFifo, O_WRONLY);
-        if (clientFd == -1)
-        { /* Open failed, give up on client */
-            errMsg("open %s", clientFifo);
-            continue;
-        }
-
-        /* Send response and close FIFO */
-
-        resp.seqNum = seqNum;
-        if (write(clientFd, &resp, sizeof(struct response)) != sizeof(struct response))
-            fprintf(stderr, "Error writing to FIFO %s\n", clientFifo);
-        if (close(clientFd) == -1)
-            errMsg("close");
-
-        seqNum += req.seqLen; /* Update our sequence number */
+        seq_num += request_msg.seqlen;
     }
+
+    exit(EXIT_FAILURE);
 }

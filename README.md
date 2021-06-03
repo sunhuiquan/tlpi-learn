@@ -701,6 +701,11 @@ note: 只有exit()和从main中return调用退出注册函数，被信号异常�
 
 ## CH46 System V 消息队列
 
+注意： A successful close does not guarantee that the data has been
+       successfully saved to disk, as the kernel uses the buffer cache
+       to defer writes.
+       所以说close不保证立即写回磁盘，记得O_SYNC之类的标志。
+
 注意：自定义类型中long之后可能出现字节对齐导致的padding bytes，这种情况下通过offsetof或者整个sizeof - sizeof(long)可以得到真实的剩余部分的所占用空间，在自定义消息类型的mtext的大小十分关键。
 [举例](./Exercise/46_0.c)
 

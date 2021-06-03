@@ -1,23 +1,27 @@
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include "tlpi_hdr.h"
+#ifndef MSG_SEQNUM_H
+#define MSG_SEQNUM_H
 
-#define SERVER_FIFO "/tmp/seqnum_sv"
-/* Well-known name for server's FIFO */
-#define CLIENT_FIFO_TEMPLATE "/tmp/seqnum_cl.%ld"
-/* Template for building client FIFO name */
-#define CLIENT_FIFO_NAME_LEN (sizeof(CLIENT_FIFO_TEMPLATE) + 20)
-/* Space required for client FIFO pathname
-                                  (+20 as a generous allowance for the PID) */
+#include <unistd.h>
+#include <stddef.h>
 
-struct request
-{               /* Request (client --> server) */
-    pid_t pid;  /* PID of client */
-    int seqLen; /* Length of desired sequence */
+#define SERVER_FILE "/tmp/server_file_msg_seqnum_h"
+
+// note that this struct has padding bytes, using offsetof to deal with it
+struct RequestMsg
+{
+    long mtype;
+    pid_t pid;
+    int seqlen;
 };
 
-struct response
-{               /* Response (server --> client) */
-    int seqNum; /* Start of sequence */
+struct ResponseMsg
+{
+    long mtype;
+    int seqnum;
 };
+
+#define REQUSET_SIZE (offsetof(struct RequestMsg, seqlen) - \
+                      offsetof(struct RequestMsg, pid) + sizeof(int))
+#define RESPONSE_SIZE (sizeof(int))
+
+#endif
