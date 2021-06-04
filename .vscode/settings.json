@@ -33,6 +33,7 @@
         "stat.h": "c",
         "binary_sems.h": "c",
         "sem.h": "c",
-        "shm.h": "c"
+        "shm.h": "c",
+        "svshm_xfr.h": "c"
     }
 }

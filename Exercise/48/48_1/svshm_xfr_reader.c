@@ -27,6 +27,8 @@ int main(int argc, char *argv[])
     {
         if (waitForEventFlag(semid, READ_SEM) == -1)
             errExit("waitForEventFlag");
+        if (clearEventFlag(semid, READ_SEM) == -1)
+            errExit("clearEventFlag");
 
         if (shmp->cnt == 0) /* Writer encountered EOF */
             break;

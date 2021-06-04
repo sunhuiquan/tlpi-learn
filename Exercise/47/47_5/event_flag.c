@@ -3,6 +3,8 @@
 #include "../semun.h"
 #include "event_flag.h"
 
+#include <stdio.h>
+
 int setEventFlag(int semId, int semNum)
 {
     union semun arg;
@@ -22,7 +24,6 @@ int clearEventFlag(int semId, int semNum)
 int waitForEventFlag(int semId, int semNum)
 {
     struct sembuf sops;
-    printf("a\n");
 
     sops.sem_num = semNum;
     sops.sem_op = 0;

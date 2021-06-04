@@ -33,8 +33,11 @@ int main(int argc, char *argv[])
 
     for (xfrs = 0, bytes = 0;; xfrs++, bytes += shmp->cnt)
     {
+        // 注意这种非原子性的操作容易出竞争bug，不过幸好这里是迭代而且只有这一处用到，所以没有竞争
         if (waitForEventFlag(semid, WRITE_SEM) == -1)
             errExit("waitForEventFlag");
+        if (clearEventFlag(semid, WRITE_SEM) == -1)
+            errExit("clearEventFlag");
 
         shmp->cnt = read(STDIN_FILENO, shmp->buf, BUF_SIZE);
         if (shmp->cnt == -1)
@@ -55,6 +58,8 @@ int main(int argc, char *argv[])
 
     if (waitForEventFlag(semid, WRITE_SEM) == -1)
         errExit("waitForEventFlag");
+    if (clearEventFlag(semid, WRITE_SEM) == -1)
+        errExit("clearEventFlag");
 
     if (semctl(semid, 0, IPC_RMID, dummy) == -1)
         errExit("semctl");
