@@ -32,6 +32,7 @@
         "types.h": "c",
         "stat.h": "c",
         "binary_sems.h": "c",
-        "sem.h": "c"
+        "sem.h": "c",
+        "shm.h": "c"
     }
 }
