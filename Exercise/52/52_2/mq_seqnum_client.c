@@ -22,14 +22,13 @@ int main(int argc, char *argv[])
 
     /* Create our FIFO (before sending request, to avoid a race) */
 
-    umask(0); /* So we get the permissions we want */
     snprintf(clientMQ, CLIENT_MQ_NAME_LEN, CLIENT_MQ_TEMPLATE,
              (long)getpid());
 
     attr.mq_flags = 0;
     attr.mq_maxmsg = 10;
-    attr.mq_maxmsg = sizeof(req);
-    if ((clientFd = mq_open(clientMQ, O_CREAT | O_EXCL | O_RDONLY), &attr, 0666) == -1)
+    attr.mq_msgsize = sizeof(req);
+    if ((clientFd = mq_open(clientMQ, O_CREAT | O_EXCL | O_RDONLY, 0666, &attr)) == -1)
         errExit("mq_open");
 
     if (atexit(removeFifo) != 0)
@@ -42,7 +41,7 @@ int main(int argc, char *argv[])
     if (serverFd == -1)
         errExit("mq_open");
 
-    if (mq_send(serverFd, &req, sizeof(req), NULL) == -1)
+    if (mq_send(serverFd, (char *)&req, sizeof(req), 0) == -1)
         fatal("Can't write to server");
 
     /* Open our FIFO, read and display response */
@@ -51,7 +50,7 @@ int main(int argc, char *argv[])
     if (clientFd == -1)
         errExit("mq_open");
 
-    if (mq_receive(clientFd, &resp, sizeof(struct response), NULL) != sizeof(struct response))
+    if (mq_receive(clientFd, (char *)&resp, attr.mq_msgsize, NULL) != sizeof(struct response))
         fatal("Can't read response from server");
 
     printf("%d\n", resp.seqNum);
