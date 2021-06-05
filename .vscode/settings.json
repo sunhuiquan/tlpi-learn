@@ -34,6 +34,7 @@
         "binary_sems.h": "c",
         "sem.h": "c",
         "shm.h": "c",
-        "svshm_xfr.h": "c"
+        "svshm_xfr.h": "c",
+        "mq_seqnum.h": "c"
     }
 }
