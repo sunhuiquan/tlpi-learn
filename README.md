@@ -851,13 +851,15 @@ linux中实现是创建新线程来处理通知，如果一个线程处理完前
 ## CH53 POSIX信号量
 
 ### 53.1
+[代码](./Exercise/53/53_1/posix_thread_xfr.c)
 
 ### 53.2
-[代码](Exercise/53/53_2) 别忘了删除(unlink或者在/dev/shm删除对应(注意我们的/name会自动转换未sem.name的虚拟文件名))
+[代码](./Exercise/53/53_2) 别忘了删除(unlink或者在/dev/shm删除对应(注意我们的/name会自动转换未sem.name的虚拟文件名))
 
 ### 53.3
 
 ### 53.4
+[代码](./Exercise/53/53_4)
 Machine： AliCloud-ECS Linux-Ubuntu 20.04 2G 4cores
 thr-num  mutex  ratio posix  ratio systemV
 1        0.002  1.5   0.003  39    0.117
