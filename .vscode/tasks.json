@@ -9,7 +9,9 @@
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}",
+                "-Wall",
                 "-ltlpi",
+                "-lrt",
                 "-pthread"
             ],
             "options": {

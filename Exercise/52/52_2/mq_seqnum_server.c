@@ -20,7 +20,6 @@ int main(int argc, char *argv[])
 
     for (;;)
     {
-        // 这种传输的大小一定是这么大
         if (mq_receive(serverFd, (char *)&req, attr.mq_msgsize, NULL) != sizeof(req))
         {
             fprintf(stderr, "Error reading request; discarding\n");

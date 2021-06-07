@@ -818,7 +818,10 @@ to do
 ## CH52 POSIX消息队列
 
 note: 千万注意要用mq_的系列函数，比如mq_unlink才会删除，而unlink是不会删除的。
+
 note: timespec是秒和纳秒，clock_gettime对应timespec，注意如果是用绝对时间做定时，要把定时的时间加上当前时间。
+
+note: 一个消息队列对象是发送和接受同一种类型的(这样才能正确解析)，所以msgsize可以设置成要发送的消息的大小，同时用attr.msgsize作为receive的参数(必须是大于等于这个的，否则会EMSGSIZE错误，因为可能无法接收可能到来的最大的消息)；不同消息队列的对象可能用的类型不一样，比如server客户发送请求和服务器解析请求，client服务器发送响应，客户接受响应，注意同一个消息队列对象的发送和接受的类型是一样的。
 
 ??? unlink 立即删除硬链接？？ mq_unlink呢？？
 
@@ -828,6 +831,10 @@ note: timespec是秒和纳秒，clock_gettime对应timespec，注意如果是用
 ### 52.2
 [代码](./Exercise/52/52_2)
 
+### 52.3
+[代码](./Exercise/52/52_3)
+
+### 52.4
 
 ---
 <br>

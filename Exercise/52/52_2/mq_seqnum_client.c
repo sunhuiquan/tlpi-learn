@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
     attr.mq_flags = 0;
     attr.mq_maxmsg = 10;
-    attr.mq_msgsize = sizeof(req);
+    attr.mq_msgsize = sizeof(struct response);
     if ((clientFd = mq_open(clientMQ, O_CREAT | O_EXCL | O_RDONLY, 0666, &attr)) == -1)
         errExit("mq_open");
 
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
         errExit("mq_open");
 
     if (mq_receive(clientFd, (char *)&resp, attr.mq_msgsize, NULL) != sizeof(struct response))
-        fatal("Can't read response from server");
+        errExit("read");
 
     printf("%d\n", resp.seqNum);
     exit(EXIT_SUCCESS);
