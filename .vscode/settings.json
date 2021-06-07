@@ -36,6 +36,7 @@
         "shm.h": "c",
         "svshm_xfr.h": "c",
         "mq_seqnum.h": "c",
-        "mqueue.h": "c"
+        "mqueue.h": "c",
+        "time.h": "c"
     }
 }
