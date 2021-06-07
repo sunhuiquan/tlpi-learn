@@ -57,13 +57,13 @@ int main(int argc, char *argv[])
     /* File was opened successfully by server; process messages
        (including the one already received) containing file data */
 
-    totBytes = msgLen; /* Count first message */
+    totBytes = msgLen - sizeof(mtype); /* Count first message */
     for (numMsgs = 1; resp.type == RESP_MT_DATA; numMsgs++)
     {
         if ((msgLen = mq_receive(client_mqd, (char *)&resp, attr.mq_msgsize, NULL)) == -1)
             errExit("mq_receive");
 
-        totBytes += msgLen;
+        totBytes += msgLen - sizeof(mtype);
     }
 
     printf("Received %ld bytes (%d messages)\n", (long)totBytes, numMsgs);

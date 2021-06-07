@@ -22,7 +22,7 @@ serveRequest(const struct requestMsg *req)
     mqd_t client_id;
     char client_name[PATH_MAX];
 
-    sprintf(client_name, CLIENT_FILE, (long)getpid());
+    sprintf(client_name, CLIENT_FILE, (long)req->pid);
     if ((client_id = mq_open(client_name, O_WRONLY)) == -1)
         errExit("mq_open");
 
