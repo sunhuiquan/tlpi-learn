@@ -857,6 +857,7 @@ linux中实现是创建新线程来处理通知，如果一个线程处理完前
 [代码](./Exercise/53/53_2) 别忘了删除(unlink或者在/dev/shm删除对应(注意我们的/name会自动转换未sem.name的虚拟文件名))
 
 ### 53.3
+to do
 
 ### 53.4
 [代码](./Exercise/53/53_4)
@@ -873,6 +874,12 @@ thr-num  mutex  ratio posix  ratio systemV
 <br>
 
 ## CH54 POSIX共享内存
+
+NOTE：注意mmap的读需要用读方式打开，写则要求读写模式打开共享内存段，而ftruncate与访问权限无关。
+NOTE：注意ftruncate是对共享内存段操作，所以说shm_open创建的时候初始化共享段大小，之后打开是根本不需要的。
+
+### 54.1
+[代码](./Exercise/54_1) 注意mmap的权限是PROT_XX的格式，打开权限是O_XX，文件模式是S_IXX，这些宏的值都不一样，别再搞错了。。。
 
 ---
 <br>
