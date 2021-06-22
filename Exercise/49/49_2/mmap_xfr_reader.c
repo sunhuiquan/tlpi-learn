@@ -1,9 +1,10 @@
-#include "svshm_xfr.h"
+#include "./mmap_xfr.h"
 
 int main(int argc, char *argv[])
 {
-	int semid, shmid, xfrs, bytes;
-	struct shmseg *shmp;
+	int semid, xfrs, bytes, fd;
+	struct seg *seg_addr;
+	void *addr;
 
 	/* Get IDs for semaphore set and shared memory created by writer */
 
@@ -11,15 +12,13 @@ int main(int argc, char *argv[])
 	if (semid == -1)
 		errExit("semget");
 
-	shmid = shmget(SHM_KEY, 0, 0);
-	if (shmid == -1)
-		errExit("shmget");
-
-	/* Attach shared memory read-only, as we will only read */
-
-	shmp = shmat(shmid, NULL, SHM_RDONLY);
-	if (shmp == (void *)-1)
-		errExit("shmat");
+	if ((fd = open(SHARED_FILE, O_RDONLY)) == -1)
+		errExit("open");
+	if ((addr = mmap(NULL, sizeof(struct seg), PROT_READ, MAP_SHARED, fd, 0)) == MAP_FAILED)
+		errExit("mmap");
+	seg_addr = (struct seg *)addr;
+	if (close(fd) == -1)
+		errExit("close");
 
 	/* Transfer blocks of data from shared memory to stdout */
 
@@ -28,19 +27,16 @@ int main(int argc, char *argv[])
 		if (reserveSem(semid, READ_SEM) == -1) /* Wait for our turn */
 			errExit("reserveSem");
 
-		if (shmp->cnt == 0) /* Writer encountered EOF */
+		if (seg_addr->cnt == 0) /* Writer encountered EOF */
 			break;
-		bytes += shmp->cnt;
+		bytes += seg_addr->cnt;
 
-		if (write(STDOUT_FILENO, shmp->buf, shmp->cnt) != shmp->cnt)
+		if (write(STDOUT_FILENO, seg_addr->buf, seg_addr->cnt) != seg_addr->cnt)
 			fatal("partial/failed write");
 
 		if (releaseSem(semid, WRITE_SEM) == -1) /* Give writer a turn */
 			errExit("releaseSem");
 	}
-
-	if (shmdt(shmp) == -1)
-		errExit("shmdt");
 
 	/* Give writer one more turn, so it can clean up */
 

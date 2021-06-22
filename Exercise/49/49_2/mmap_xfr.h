@@ -1,16 +1,19 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/sem.h>
-#include <sys/shm.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+// #include <sys/stat.h>
 #include "../../../tlpi-dist/svsem/binary_sems.h" /* Declares our binary semaphore functions */
 #include "tlpi_hdr.h"
 
+#define OBJ_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
+
 /* Hard-coded keys for IPC objects */
 
-#define SHM_KEY 0x1234 /* Key for shared memory segment */
-#define SEM_KEY 0x5678 /* Key for semaphore set */
+#define SEM_KEY 0x1234 /* Key for semaphore set */
+#define SHARED_FILE "/tmp/shared_file"
 
-#define OBJ_PERMS (S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)
 /* Permissions for our IPC objects */
 
 /* Two semaphores are used to ensure exclusive, alternating access
@@ -23,7 +26,7 @@
 #define BUF_SIZE 1024 /* Size of transfer buffer */
 #endif
 
-struct shmseg
+struct seg
 {						/* Defines structure of shared memory segment */
 	int cnt;			/* Number of bytes used in 'buf' */
 	char buf[BUF_SIZE]; /* Data being transferred */
