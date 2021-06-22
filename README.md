@@ -791,6 +791,15 @@ to do
 
 ## CH49 内存映射
 
+### 49.1
+[代码](./Exercise/49/49_1.c) 很简单
+
+### 49.2
+
+### 49.3
+
+### 49.4
+
 ---
 <br>
 <br>
@@ -868,7 +877,6 @@ thr-num  mutex  ratio posix  ratio systemV
 16       0.079  8.3   0.659  2.4   16.05
 可以发现，当线程并发程度增加(冲突的比例上升)的时候，posix和system V信号量的比例在下降，这是因为posix只是在出现冲突的时候调用系统调用，而system V总是调用系统调用，当并发程度上升，posix调用系统调用的比例上升(即轻松的工作比例下降，重活比例上升)，而system V一直是调用系统调用(全是重活的比例)，所以会导致比值下降。
 
-
 ---
 <br>
 <br>
@@ -877,6 +885,7 @@ thr-num  mutex  ratio posix  ratio systemV
 
 NOTE：注意mmap的读需要用读方式打开，写则要求读写模式打开共享内存段，而ftruncate与访问权限无关。
 NOTE：注意ftruncate是对共享内存段操作，所以说shm_open创建的时候初始化共享段大小，之后打开是根本不需要的。
+NOTE：有点不适的是对于shm_open关闭是close，而删除又是shm_unlink，虽然我知道这是因为close实现已有，但还是感觉有点乱。(例如xx_unlink不同与unlink哦，普通的unlink删除无效的)
 
 ### 54.1
 [代码](./Exercise/54_1) 注意mmap的权限是PROT_XX的格式，打开权限是O_XX，文件模式是S_IXX，这些宏的值都不一样，别再搞错了。。。

@@ -31,6 +31,9 @@ int main(int argc, char *argv[])
     if ((void *)addr == MAP_FAILED)
         errExit("mmap");
 
+    if (close(shmid) == -1)
+        errExit("close");
+
     /* Transfer blocks of data from stdin to shared memory */
 
     for (xfrs = 0, bytes = 0;; xfrs++, bytes += addr->cnt)

@@ -19,6 +19,9 @@ int main(int argc, char *argv[])
     if ((void *)shmp == MAP_FAILED)
         errExit("mmap");
 
+    if (close(shmid) == -1)
+        errExit("close");
+
     /* Transfer blocks of data from shared memory to stdout */
 
     for (xfrs = 0, bytes = 0;; xfrs++)
