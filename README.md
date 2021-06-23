@@ -910,6 +910,12 @@ NOTE：有点不适的是对于shm_open关闭是close，而删除又是shm_unlin
 
 ## CH57 SOCKET: UNIX DOMAIN
 
+### 57.0
+[代码](./Exercise/57/0) 这是我随便试试backlog未决连接的作用。
+
+### 57.1
+[代码](./Exercise/57/1)
+
 ---
 <br>
 <br>
