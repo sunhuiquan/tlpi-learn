@@ -40,6 +40,19 @@
 + [CH46 System V 消息队列](#CH46-System-V-消息队列)
 + [CH47 System V 信号量](#CH47-System-V-信号量)
 + [CH48 System V 共享内存](#CH48-System-V-共享内存)
++ [CH49 内存映射](#CH49-内存映射)
++ [CH50 虚拟内存操作](#CH50-虚拟内存操作)
++ [CH52 POSIX消息队列](#CH52-POSIX消息队列)
++ [CH53 POSIX信号量](#CH53-POSIX信号量)
++ [CH54 POSIX共享内存](#CH54-POSIX共享内存)
++ [CH55 文件加锁](#CH55-文件加锁)
++ [CH57 SOCKET: UNIX DOMAIN](#CH57-SOCKET-UNIX-DOMAIN)
++ [CH59 SOCKET: Internet DOMAIN](#CH59-SOCKET-Internet-DOMAIN)
++ [CH60 SOCKET 服务器设计](#CH60-SOCKET-服务器设计)
++ [CH61 SOCKET 高级主题](#CH61-SOCKET-高级主题)
++ [CH62 终端](#CH62-终端)
++ [CH63 其他备选的I/O模型](#CH63-其他备选的I/O模型)
++ [CH64 伪终端](#CH64-伪终端)
 
 ## 环境搭建
 ```
@@ -884,6 +897,54 @@ NOTE：有点不适的是对于shm_open关闭是close，而删除又是shm_unlin
 
 ### 54.1
 [代码](./Exercise/54_1) 注意mmap的权限是PROT_XX的格式，打开权限是O_XX，文件模式是S_IXX，这些宏的值都不一样，别再搞错了。。。
+
+---
+<br>
+<br>
+
+## CH55 文件加锁
+
+---
+<br>
+<br>
+
+## CH57 SOCKET: UNIX DOMAIN
+
+---
+<br>
+<br>
+
+## CH59 SOCKET: Internet DOMAIN
+
+---
+<br>
+<br>
+
+## CH60 SOCKET: 服务器设计
+
+---
+<br>
+<br>
+
+## CH61 SOCKET: 高级主题
+
+---
+<br>
+<br>
+
+## CH62 终端
+
+---
+<br>
+<br>
+
+## CH63 其他备选的I/O模型
+
+---
+<br>
+<br>
+
+## CH64 伪终端
 
 ---
 <br>
