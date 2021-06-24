@@ -923,6 +923,7 @@ NOTE：有点不适的是对于shm_open关闭是close，而删除又是shm_unlin
 [代码](./Exercise/57/3)
 
 ### 57.4
+[代码](./Exercise/57/4) 因为socket file(包括linux抽象socket名空间)与socket是一对一的，一个socket只能bind一个socket file，而一个socket file也只能被一个socket绑定，所以会出现 ERROR [EADDRINUSE Address already in use] 错误
 
 ---
 <br>
