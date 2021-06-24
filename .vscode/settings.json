@@ -38,6 +38,8 @@
 		"mq_seqnum.h": "c",
 		"mqueue.h": "c",
 		"time.h": "c",
-		"us_xfr.h": "c"
+		"us_xfr.h": "c",
+		"myund.h": "c",
+		"un.h": "c"
 	}
 }
