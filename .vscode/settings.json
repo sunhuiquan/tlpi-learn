@@ -40,6 +40,8 @@
 		"time.h": "c",
 		"us_xfr.h": "c",
 		"myund.h": "c",
-		"un.h": "c"
+		"un.h": "c",
+		"is_seqnum.h": "c",
+		"netdb.h": "c"
 	}
 }
