@@ -1,4 +1,5 @@
 #include "myinet.h"
+#include <stdio.h>
 
 int inetConnect(const char *host, const char *service, int type)
 {
@@ -99,7 +100,13 @@ int inetBind(const char *service, int type, socklen_t *addrlen)
 	return initPassiveSocket(service, type, addrlen, 0, 0);
 }
 
-char *inetAddressStr(const struct sockaddr *addr, socklen_t addrlen,
-					 char *addrStr, int addrStrLen)
+char *inetAddressStr(const struct sockaddr *addr, socklen_t addrlen, char *addrStr, int addrStrLen)
 {
+	char host[NI_MAXHOST], service[NI_MAXSERV];
+
+	if (getnameinfo(addr, addrlen, host, NI_MAXHOST, service, NI_MAXSERV, NI_NUMERICSERV) == 0)
+		snprintf(addrStr, addrStrLen, "(%s,%s)", host, service);
+	else
+		snprintf(addrStr, addrStrLen, "(?UNKNOWN?)");
+	return addrStr;
 }
