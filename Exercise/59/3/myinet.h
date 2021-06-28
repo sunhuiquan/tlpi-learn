@@ -1,8 +1,11 @@
-#ifndef INET_SOCKETS_H
-#define INET_SOCKETS_H /* Prevent accidental double inclusion */
+#ifndef MYINET_H
+#define MYINET_H
 
 #include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 #include <netdb.h>
+#include <tlpi_hdr.h>
 
 int inetConnect(const char *host, const char *service, int type);
 

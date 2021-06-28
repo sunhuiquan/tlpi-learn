@@ -43,7 +43,8 @@
 		"un.h": "c",
 		"is_seqnum.h": "c",
 		"netdb.h": "c",
-		"read_line_buf.h": "c"
+		"read_line_buf.h": "c",
+		"inet_sockets.c": "cpp"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
