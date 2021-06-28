@@ -42,6 +42,8 @@
 		"myund.h": "c",
 		"un.h": "c",
 		"is_seqnum.h": "c",
-		"netdb.h": "c"
-	}
+		"netdb.h": "c",
+		"read_line_buf.h": "c"
+	},
+	"C_Cpp.errorSquiggles": "Enabled"
 }
