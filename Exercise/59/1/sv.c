@@ -17,6 +17,7 @@ int main(int argc, char *argv[])
 	char addrStr[ADDRSTRLEN];
 	char host[NI_MAXHOST];
 	char service[NI_MAXSERV];
+	struct rlbuf rlbuf;
 
 	if (argc > 1 && strcmp(argv[1], "--help") == 0)
 		usageErr("%s [init-seq-num]\n", argv[0]);
@@ -94,8 +95,8 @@ int main(int argc, char *argv[])
 		printf("Connection from %s\n", addrStr);
 
 		/* Read client request, send sequence number back */
-
-		if (readLine(cfd, reqLenStr, INT_LEN) <= 0)
+		myreadLineBufInit(cfd, &rlbuf);
+		if (myreadLineBuf(&rlbuf, reqLenStr, INT_LEN) <= 0)
 		{
 			close(cfd);
 			continue; /* Failed read; skip request */

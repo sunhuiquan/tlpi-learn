@@ -14,8 +14,8 @@ struct rlbuf
 	char buf[MAX_RLBUF];
 };
 
-void readLineBufInit(int fd, struct rlbuf *rlbuf);
+void myreadLineBufInit(int fd, struct rlbuf *rlbuf);
 
-ssize_t readLineBuf(struct rlbuf *rlbuf, char *buffer, size_t n);
+ssize_t myreadLineBuf(struct rlbuf *rlbuf, char *buffer, size_t n);
 
 #endif

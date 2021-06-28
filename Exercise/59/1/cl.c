@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 	ssize_t numRead;
 	struct addrinfo hints;
 	struct addrinfo *result, *rp;
+	struct rlbuf rlbuf;
 
 	if (argc < 2 || strcmp(argv[1], "--help") == 0)
 		usageErr("%s server-host [sequence-len]\n", argv[0]);
@@ -55,11 +56,12 @@ int main(int argc, char *argv[])
 	if (write(cfd, reqLenStr, strlen(reqLenStr)) != strlen(reqLenStr))
 		fatal("Partial/failed write (reqLenStr)");
 	if (write(cfd, "\n", 1) != 1)
-		fatal("Partial/failed write (newline)");
+		fatal("Partial/failed qwrite (newline)");
 
 	/* Read and display sequence number returned by server */
 
-	numRead = readLine(cfd, seqNumStr, INT_LEN);
+	myreadLineBufInit(cfd, &rlbuf);
+	numRead = myreadLineBuf(&rlbuf, seqNumStr, INT_LEN);
 	if (numRead == -1)
 		errExit("readLine");
 	if (numRead == 0)

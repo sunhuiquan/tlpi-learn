@@ -2,7 +2,7 @@
 #include <sys/socket.h>
 #include <signal.h>
 #include <tlpi_hdr.h>
-#include "../../../tlpi-dist/sockets/read_line.h"
+#include "my_read_line_buf.h"
 
 #define PORT_NUM "50000" /* Port number for server */
 
