@@ -931,6 +931,12 @@ NOTE：有点不适的是对于shm_open关闭是close，而删除又是shm_unlin
 
 ## CH59 SOCKET: Internet DOMAIN
 
+NOTE: 注意下，链接要有.o或者静态库、动态库代码，别犯傻了。
+NOTE: vscode的debug本质是gdb套壳，gdb使用一定要有-g提供符号等信息，如果没有-g的话gdb体现是没有各种代码信息，vscode的体现是无法打开函数对应的源文件单步调试，尤其是注意.o/.a/.so的-g也是如此，不然是无法在对应的代码里面单步调试的。
+
+### 59.1
+[代码](./Exercise/59/1)
+
 ---
 <br>
 <br>

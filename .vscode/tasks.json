@@ -7,6 +7,7 @@
 			"args": [
 				"-g",
 				"${file}",
+				"/home/water/work/TLPI_learn_note/Exercise/59/1/myrlb.o",
 				"-o",
 				"${fileDirname}/${fileBasenameNoExtension}",
 				"-Wall",
