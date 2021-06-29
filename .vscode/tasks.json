@@ -7,7 +7,6 @@
 			"args": [
 				"-g",
 				"${file}",
-				"/home/water/work/TLPI_learn_note/Exercise/59/4/kv.o",
 				"-o",
 				"${fileDirname}/${fileBasenameNoExtension}",
 				"-Wall",
