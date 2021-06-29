@@ -45,7 +45,8 @@
 		"netdb.h": "c",
 		"read_line_buf.h": "c",
 		"inet_sockets.c": "cpp",
-		"myinet.h": "c"
+		"myinet.h": "c",
+		"socket.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
