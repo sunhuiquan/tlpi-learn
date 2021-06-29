@@ -46,7 +46,8 @@
 		"read_line_buf.h": "c",
 		"inet_sockets.c": "cpp",
 		"myinet.h": "c",
-		"socket.h": "c"
+		"socket.h": "c",
+		"read_line.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
