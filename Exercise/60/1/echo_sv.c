@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if ((sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0666, MAX_CONNECTIONS)) != SEM_FAILED)
+	if ((sem = sem_open(SEM_NAME, O_CREAT | O_EXCL, 0666, MAX_CONNECTIONS)) == SEM_FAILED)
 	{
 		syslog(LOG_ERR, "Could not create sem (%s)", strerror(errno));
 		exit(EXIT_FAILURE);

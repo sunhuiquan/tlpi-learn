@@ -23,6 +23,10 @@ int main(int argc, char *argv[])
 			sprintf(buf, "%d", i);
 			if (write(sfd, buf, strlen(buf)) != strlen(buf))
 				err_exit("write");
+
+			// 模拟服务器处理一个请求所需要的时间
+			sleep(5);
+
 			if (read(sfd, buf, BUF_SIZE) <= 0)
 				err_exit("read");
 			printf("%s\n", buf);
