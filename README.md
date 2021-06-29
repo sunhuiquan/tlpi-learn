@@ -958,6 +958,8 @@ NOTE: fflush不一定实现刷新输入流，所以用while((c = getchar()) != '
 
 ## CH60 SOCKET: 服务器设计
 
+NOTE: ubuntu没有默认安装inetd，是一个进程监听一个socket服务的，从ps -A可以看出来一堆这样的进程。
+
 ---
 <br>
 <br>
