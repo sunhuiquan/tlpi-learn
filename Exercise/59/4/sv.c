@@ -37,20 +37,25 @@ int main()
 		printf("connect from: %s\n", inetAddressStr((struct sockaddr *)&claddr,
 													addrlen, addrStr, IS_ADDR_STR_LEN));
 
-		if ((n = readLine(confd, command, MAXLINE)) <= 0)
+		for (;;)
 		{
-			errMsg("readLine fail");
-			close(confd);
-			continue;
+			if ((n = readLine(confd, command, MAXLINE)) < 0)
+			{
+				errMsg("readLine fail");
+				close(confd);
+				continue;
+			}
+			if (n == 0) // client socket closed
+				break;
+
+			printf("command: %s", command);
+
+			handle_command(command, bufline);
+
+			if (write(confd, bufline, strlen(bufline)) != strlen(bufline))
+				errMsg("write fail");
 		}
-		printf("command: %s", command);
-
-		handle_command(command, bufline);
-
-		strcpy(bufline, command);
-
-		if (write(confd, bufline, n) != n)
-			errMsg("write fail");
+		printf("\n");
 		close(confd);
 	}
 
@@ -64,6 +69,11 @@ int handle_command(char *command, char *result)
 	temp[strlen(temp) - 1] = ' '; // '\n' 变 ' '
 	char *words[4];
 	char *ptemp = temp, *p;
+	char t[MAXLINE];
+
+	if (result == NULL)
+		return -1;
+	result[0] = '\0';
 
 	int i = 0;
 	for (; i < 3; ++i)
@@ -78,16 +88,49 @@ int handle_command(char *command, char *result)
 	}
 
 	if (!strcmp(words[0], "add") && i == 3)
-		return add_kv(kv, words[1], words[2]);
+	{
+		if (add_kv(kv, words[1], words[2]) == -1)
+		{
+			sprintf(result, "add failed\n");
+			return -1;
+		}
+		sprintf(result, "add sussessed\n");
+		return 0;
+	}
 	else if (!strcmp(words[0], "delete") && i == 2)
-		return delete_kv(kv, words[1]);
+	{
+		if (delete_kv(kv, words[1]) == -1)
+		{
+			sprintf(result, "delete failed\n");
+			return -1;
+		}
+		sprintf(result, "delete sussessed\n");
+		return 0;
+	}
 	else if (!strcmp(words[0], "change") && i == 3)
-		return change_kv(kv, words[1], words[2]);
+	{
+		if (change_kv(kv, words[1], words[2]) == -1)
+		{
+			sprintf(result, "change failed\n");
+			return -1;
+		}
+		sprintf(result, "change sussessed\n");
+		return 0;
+	}
 	else if (!strcmp(words[0], "show") && i == 1)
 	{
-		kv_dsa *p = kv;
+		kv_dsa *p = kv->next;
 		for (; p; p = p->next)
-			sprintf(result, "(%s : %s)\n", p->key, p->value);
+		{
+			sprintf(t, "(%s : %s); ", p->key, p->value);
+			if (strlen(t) + strlen(result) + 1 > MAXLINE)
+			{
+				sprintf(result, "too long\n");
+				return -1;
+			}
+			strcat(result, t);
+		}
+		strcat(result, "\n");
 		return 0;
 	}
 

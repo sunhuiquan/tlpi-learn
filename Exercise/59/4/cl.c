@@ -13,7 +13,10 @@ int main(int argc, char *argv[])
 	char command[MAXLINE];
 
 	if (argc != 3)
-		printf("usage: <host> <port>");
+	{
+		printf("usage: <host> <port>\n");
+		exit(EXIT_SUCCESS);
+	}
 
 	if ((clfd = inetConnect(argv[1], argv[2], SOCK_STREAM)) == -1)
 		errExit("inetConnect");
@@ -49,6 +52,13 @@ int main(int argc, char *argv[])
 			errExit("readLine");
 		if (n)
 			printf("%s", bufline);
+		else // EOF
+			break;
+
+		printf("enter to continue\n");
+		while (getchar() != '\n')
+			;
+		system("clear");
 	}
 
 	return 0;
