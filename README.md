@@ -351,8 +351,28 @@ _PC_PIPE_BUF, 4096
 	fflush(fp);
 	fsync(fileno(fp));
 ```
+fflush是把fp流对应的stdio缓冲区全部刷新进入内核高速缓存，然后fsync是把fp对应的fd所对应的内核高速缓存(这次fflush放入的+之前放入还没刷新的)刷新到磁盘上；如果没有fflush只有fsync那么只是刷新fp对应的内核高速缓存到磁盘，而fp对应的stdio缓冲区没刷新。
 
 ### 13.4
+[代码](./Exercise/13/13_4.c)<br>
+![IMG](./IMG/13_4.png)<br>
+
+```
+printf("aaa\n");
+write(STDOUT_FILENO,"bbb\n",xxx);
+```
+(1)未重定向
+	printf指向终端是所以stdio缓冲区是行缓冲，而且有\n，那么printf直接刷入内核高速缓存显示，然后write写入内核高速缓冲显示,所以结果是
+```
+	aaa
+	bbb
+```
+(2)定向到磁盘文件
+	printf指向不是终端而是磁盘文件，所以stdio缓冲区是全缓冲，那么printf放到stdio缓冲区，然后write写入内核高速缓冲区显示，这里stdio缓冲区也没满，是return销毁main栈帧后调用exit，这才刷新stdio缓冲区才放到内核高速缓冲的，所以这个顺序的结果是
+```
+	bbb
+	aaa
+```
 
 
 ### 13.5
