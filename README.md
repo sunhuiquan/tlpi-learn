@@ -374,9 +374,9 @@ write(STDOUT_FILENO,"bbb\n",xxx);
 	aaa
 ```
 
-
 ### 13.5
-
+[代码](./Exercise/13/13_5.c) 本来以为要debug好几次的，结果发现写的竟然直接能跑，惊喜<br>
+lseek快速定位到文件最后-一个bufsize的位置，读入这一个bufsize，然后倒着顺序遍历检查里面多少个'\n'，不够那么再循环-bufsize，知道lseek定位到对应倒数对应行数开头，(文件位置是属于打开文件描述的属性，所以之后直接write就是从这个位置属性后开始的)，然后write输出即可
 
 ---
 <br>
