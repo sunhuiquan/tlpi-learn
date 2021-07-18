@@ -1,5 +1,6 @@
 # TLPI_learn_note
-《LINUX/LINUX系统编程手册》学习记录和练习习题解答。
+《Linux/UNIX系统编程手册》习题答案和部分笔记。
+（代码可以从README的超链接或者/Exercise文件夹下对应章节数字找到）
 
 ## Index:
 + [环境搭建](#环境搭建)
@@ -198,7 +199,9 @@ int main()
 ```
 
 ### 6.3
+
 [我的简陋实现](./Exercise/6_3.c)
+
 ---
 <br>
 <br>
