@@ -388,7 +388,16 @@ lseek快速定位到文件最后-一个bufsize的位置，读入这一个bufsize
 ## CH14 文件系统
 
 ### 14.1
-[代码](./Exercise/14/14_1.c)
+我只有ext4和tmpfs,tmpfs是/run路径挂载的
+```
+	more /proc/mounts | grep tmpfs
+	发现有 none /run tmpfs rw,nosuid,noexec,noatime,mode=755 0 0
+```
+![IMG](./IMG/14_1a.png)<br>
+发现有序建立再有序删除比随机建立再有序删除快<br>
+![IMG](./IMG/14_1b.png)<br>
+因为是tmpfs是建立再内存上而不是磁盘上的文件系统，所以快非常多，同样符合有序建立再有序删除比随机建立再有序删除快<br>
+[这里是代码](./Exercise/14/14_1.c)
 
 ---
 <br>

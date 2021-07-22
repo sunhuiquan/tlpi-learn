@@ -10,10 +10,10 @@
 			"request": "launch",
 			"program": "${fileDirname}/${fileBasenameNoExtension}",
 			"args": [
-				"out.txt"
+				"1000"
 			],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/13", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/14", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",
