@@ -485,6 +485,8 @@ symlink()的第一个参数就是要设置给符号链接的内容，然后解�
 无语了，readdir_r已经弃用了，这里只是为了做题用了下。"This function is deprecated; use readdir(3) instead. -- man page"
 
 ### 18.5
+[代码](./Exercise/18/5/18_5.c)
+C的字符串处理和没有STL容器真恶心，不过没想到标准库里实现了strrctr倒序查找。
 
 ### 18.6
 
@@ -493,7 +495,7 @@ symlink()的第一个参数就是要设置给符号链接的内容，然后解�
 ### 18.8
 
 ### 18.9
-fchdir在反复用中快，因为fd打开一次后就一直用，而chdir里面实现要不停打开关闭fd。
+
 
 ---
 <br>

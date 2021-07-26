@@ -9,9 +9,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${fileDirname}/${fileBasenameNoExtension}",
-			"args": [
-				"18_3.c"
-			],
+			"args": [],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/Exercise/18/3", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
