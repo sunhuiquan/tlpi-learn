@@ -9,9 +9,11 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${fileDirname}/${fileBasenameNoExtension}",
-			"args": [],
+			"args": [
+				"/home/water/work/TLPI_learn_note"
+			],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/18/3", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/18/8", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",

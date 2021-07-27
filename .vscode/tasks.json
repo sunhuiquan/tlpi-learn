@@ -5,6 +5,7 @@
 			"label": "C/C++: gcc-9 生成活动文件",
 			"command": "/usr/bin/gcc-9",
 			"args": [
+				"${fileDirname}/mynftw.o", // ${fileDirname}指的是要debug的文件所在的目录地址
 				"-g",
 				"${file}",
 				"-o",

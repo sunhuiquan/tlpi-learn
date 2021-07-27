@@ -49,7 +49,8 @@
 		"socket.h": "c",
 		"read_line.h": "c",
 		"inet_sockets.h": "c",
-		"become_daemon.h": "c"
+		"become_daemon.h": "c",
+		"ftw.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
