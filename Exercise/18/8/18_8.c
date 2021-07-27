@@ -22,6 +22,13 @@ int _ftw_rec(const char *pathname, func_t func, int descriptors, int flag, int l
 	char path[PATH_MAX] = "";
 	char temp[PATH_MAX];
 	char cwd[PATH_MAX];
+	int dev;
+	struct FTW info;
+	int f;
+
+	if (stat(pathname, &sbuf) == -1)
+		return -1;
+	dev = sbuf.st_dev;
 
 	if (flag & FTW_CHDIR)
 	{
@@ -33,10 +40,13 @@ int _ftw_rec(const char *pathname, func_t func, int descriptors, int flag, int l
 	else
 	{
 		if (pathname[strlen(pathname) - 1] != '/')
-			sprintf(path, "%s/", pathname); // 这里是为了确保有个'/'，因为'/////'都等同于一个'/'没关系
+			sprintf(path, "%s/", pathname); // 这里是为了确保有个'/'，因为'//'都等同于一个'/'没关系
 		else
-			sprintf(path, "%s", pathname); // 这里是为了确保有个'/'，因为'/////'都等同于一个'/'没关系
+			sprintf(path, "%s", pathname);
 	}
+
+	info.base = strlen(path);
+	info.level = level;
 
 	if ((dir = opendir(pathname)) == NULL)
 		return -1;
@@ -61,15 +71,19 @@ int _ftw_rec(const char *pathname, func_t func, int descriptors, int flag, int l
 		if (flag & FTW_PHYS)
 		{
 			if (lstat(temp, &sbuf) == -1)
-				return -1;
+				continue;
 		}
 		else if (stat(temp, &sbuf) == -1)
-			return -1;
+			continue;
+
+		if (sbuf.st_dev != dev)
+			continue;
 
 		if (strcmp(dirent->d_name, ".."))
 		{
 			if (S_ISDIR(sbuf.st_mode))
 			{
+				f = FTW_D;
 				if (strlen(temp) > 2 && temp[strlen(temp) - 1] == '.' && temp[strlen(temp) - 2] == '/')
 				{
 					if (!(level == 0 && temp[0] == '/' && *dirent->d_name == '.'))
@@ -77,13 +91,22 @@ int _ftw_rec(const char *pathname, func_t func, int descriptors, int flag, int l
 							continue;
 				}
 
-				if (func(temp, &sbuf, 0, NULL) != 0)
+				errno = 0;
+				if (access(temp, R_OK) == -1)
 				{
-					if (flag & FTW_CHDIR)
-						if (chdir(cwd) == -1)
-							return -1;
-					return ret_value;
+					if (errno)
+						continue;
+					f = FTW_DNR;
 				}
+
+				if (!(flag & FTW_DEPTH))
+					if (func(temp, &sbuf, f, NULL) != 0)
+					{
+						if (flag & FTW_CHDIR)
+							if (chdir(cwd) == -1)
+								return -1;
+						return ret_value;
+					}
 
 				if (strcmp(dirent->d_name, "."))
 				{
@@ -95,13 +118,37 @@ int _ftw_rec(const char *pathname, func_t func, int descriptors, int flag, int l
 						return ret_value;
 					}
 				}
+
+				if (flag & FTW_DEPTH)
+				{
+					if (f != FTW_DNR)
+						f = FTW_DP;
+					if (func(temp, &sbuf, f, NULL) != 0)
+					{
+						if (flag & FTW_CHDIR)
+							if (chdir(cwd) == -1)
+								return -1;
+						return ret_value;
+					}
+				}
 			}
-			else if (func(temp, &sbuf, 0, NULL) != 0)
+			else
 			{
-				if (flag & FTW_CHDIR)
-					if (chdir(cwd) == -1)
-						return -1;
-				return ret_value;
+				f = FTW_F;
+
+				if (flag & FTW_PHYS && S_ISLNK(sbuf.st_mode))
+					f = FTW_SL;
+
+				if (!(flag & FTW_PHYS) && S_ISLNK(sbuf.st_mode))
+					f = FTW_SLN;
+
+				if (func(temp, &sbuf, f, &info) != 0)
+				{
+					if (flag & FTW_CHDIR)
+						if (chdir(cwd) == -1)
+							return -1;
+					return ret_value;
+				}
 			}
 		}
 	}

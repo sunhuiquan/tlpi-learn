@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	}
 
 	flag |= FTW_PHYS; // 不对符号链接解引用，才可以看到符号链接本身
-	if (mynftw(argv[1], count_file, 10, flag) == -1)
+	if (mynftw(argv[1], count_file, 30, flag) == -1)
 		errExit("nftw");
 
 	printf("Regular files takes about %.4lf%%\n", (double)regular_file / (regular_file + dir_file + sym_link) * 100);
