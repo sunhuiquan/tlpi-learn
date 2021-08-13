@@ -9,7 +9,14 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${fileDirname}/${fileBasenameNoExtension}",
-			"args": [],
+			"args": [
+				"setfattr",
+				"-n",
+				"user.abc",
+				"-v" ,
+				"123", 
+				"./a"
+			],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/Exercise/16", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
