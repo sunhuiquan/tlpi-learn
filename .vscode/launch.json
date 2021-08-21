@@ -11,10 +11,11 @@
 			"program": "${fileDirname}/${fileBasenameNoExtension}",
 			"args": [
 				"u",
-				"1000"
+				"u",
+				"tfile"
 			],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/16", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/17", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",
