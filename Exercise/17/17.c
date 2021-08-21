@@ -27,9 +27,18 @@ int get_perms(char *perms, acl_entry_t *entry, acl_permset_t *permset)
 	return 0;
 }
 
+char *use_mask(char *str, char *mask)
+{
+	int len = (strlen(str) < strlen(mask)) ? strlen(str) : strlen(mask);
+	for (int i = 0; i < len; ++i)
+		if (str[i] != mask[i]) // char是值类型，比的没问题
+			str[i] = '-';
+	return str;
+}
+
 int main(int argc, char *argv[])
 {
-	int is_user = 0, is_find = 0, is_holder = 0, entryId;
+	int is_user = 0, is_find = 0, is_holder = 0, need_mask = 0, entryId;
 	char name[256], user[256], group[256];
 	struct passwd *pwd;
 	struct group *grp;
@@ -42,6 +51,7 @@ int main(int argc, char *argv[])
 	char perms[10] = "";
 	char obj_perms[10] = "";
 	char other_perms[10] = "";
+	char mask[10] = "";
 	struct stat sbuf;
 
 	if (argc != 4 || !strcmp(argv[1], "-help"))
@@ -140,6 +150,7 @@ int main(int argc, char *argv[])
 			{
 				if (get_perms(perms, &entry, &permset) == -1)
 					errExit("get_perms");
+				need_mask = 1;
 				is_find = 1;
 				break;
 			}
@@ -161,6 +172,7 @@ int main(int argc, char *argv[])
 			{
 				if (get_perms(perms, &entry, &permset) == -1)
 					errExit("get_perms");
+				need_mask = 1;
 				is_find = 1;
 				break;
 			}
@@ -176,10 +188,14 @@ int main(int argc, char *argv[])
 		{
 			if (get_perms(obj_perms, &entry, &permset) == -1)
 				errExit("get_perms");
+			need_mask = 1;
 			is_holder = 1;
 		}
 		if (tag == ACL_OTHER)
 			if (get_perms(other_perms, &entry, &permset) == -1)
+				errExit("get_perms");
+		if (tag == ACL_MASK)
+			if (get_perms(mask, &entry, &permset) == -1)
 				errExit("get_perms");
 	}
 
@@ -187,9 +203,17 @@ int main(int argc, char *argv[])
 		errExit("acl_free");
 
 	if (is_find)
+	{
+		if (need_mask)
+			use_mask(perms, mask);
 		printf("%s\n", perms);
+	}
 	else if (is_holder)
+	{
+		if (need_mask)
+			use_mask(obj_perms, mask);
 		printf("%s\n", obj_perms);
+	}
 	else
 		printf("%s\n", other_perms);
 
