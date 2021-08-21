@@ -4,50 +4,66 @@
 #include <grp.h>
 #include <errno.h>
 #include <tlpi_hdr.h>
+#include <sys/stat.h>
 
-int get_perms(char *perms, acl_entry_t *entry, acl_permset_t *permset, int permVal)
+int get_perms(char *perms, acl_entry_t *entry, acl_permset_t *permset)
 {
 	if (acl_get_permset(*entry, permset) == -1)
 		return -1;
 
-	permVal = acl_get_perm(*permset, ACL_READ);
+	int permVal = acl_get_perm(*permset, ACL_READ);
 	if (permVal == -1)
 		return -1;
-	fprintf(perms, "%s %c", perms, (permVal == 1) ? 'r' : '-');
+	strcat(perms, (permVal == 1) ? "r" : "-");
 	permVal = acl_get_perm(*permset, ACL_WRITE);
 	if (permVal == -1)
 		return -1;
-	fprintf(perms, "%s %c", perms, (permVal == 1) ? 'w' : '-');
+	strcat(perms, (permVal == 1) ? "w" : "-");
 	permVal = acl_get_perm(*permset, ACL_EXECUTE);
 	if (permVal == -1)
 		return -1;
-	fprintf(perms, "%s %c\n", perms, (permVal == 1) ? 'x' : '-');
+	strcat(perms, (permVal == 1) ? "x" : "-");
+
+	return 0;
 }
 
 int main(int argc, char *argv[])
 {
-	int is_user = 0;
-	char *name;
+	int is_user = 0, is_find = 0, is_holder = 0, entryId;
+	char name[256], user[256], group[256];
 	struct passwd *pwd;
 	struct group *grp;
 	acl_t acl;
-	acl_type_t type;
 	acl_entry_t entry;
 	acl_tag_t tag;
 	uid_t *uidp;
 	gid_t *gidp;
 	acl_permset_t permset;
-	char *acl_name;
-	int entryId, permVal, opt;
 	char perms[10] = "";
 	char obj_perms[10] = "";
-	int is_find = 0;
+	char other_perms[10] = "";
+	struct stat sbuf;
 
-	if (argc != 3 || !strcmp(argv[1], "-help"))
+	if (argc != 4 || !strcmp(argv[1], "-help"))
 	{
 		printf("usage: %s <u|g> <user|group> <file>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
+
+	if (stat(argv[3], &sbuf) == -1)
+		errExit("stat");
+
+	pwd = getpwuid((int)sbuf.st_uid);
+	if (pwd == NULL)
+		errExit("getpwuid fail or can't find");
+	else
+		strncpy(user, pwd->pw_name, 256);
+
+	grp = getgrgid((int)sbuf.st_gid);
+	if (grp == NULL)
+		errExit("getpwuid fail or can't find");
+	else
+		strncpy(group, pwd->pw_name, 256);
 
 	if (!strcmp(argv[1], "u"))
 	{
@@ -59,15 +75,15 @@ int main(int argc, char *argv[])
 			if (pwd == NULL)
 			{
 				if (errno == 0) // 找不到说明之前那个就是字符型的名
-					name = argv[2];
+					strncpy(name, argv[2], 256);
 				else
 					errExit("getpwuid");
 			}
 			else
-				name = pwd->pw_name;
+				strncpy(name, pwd->pw_name, 256);
 		}
 		else
-			name = argv[2];
+			strncpy(name, argv[2], 256);
 	}
 	else if (!strcmp(argv[1], "g"))
 	{
@@ -78,15 +94,15 @@ int main(int argc, char *argv[])
 			if (grp == NULL)
 			{
 				if (errno == 0) // 找不到说明之前那个就是字符串形式的名
-					name = argv[2];
+					strncpy(name, argv[2], 256);
 				else
 					errExit("getpwuid");
 			}
 			else
-				name = grp->gr_name;
+				strncpy(name, grp->gr_name, 256);
 		}
 		else
-			name = argv[2];
+			strncpy(name, argv[2], 256);
 	}
 	else
 	{
@@ -94,11 +110,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	printf("%s\n", name);
-
-	// ------------------------------------------------------------------
-
-	acl = acl_get_file(argv[3], type);
+	acl = acl_get_file(argv[3], ACL_TYPE_ACCESS);
 	if (acl == NULL)
 		errExit("acl_get_file");
 
@@ -117,7 +129,7 @@ int main(int argc, char *argv[])
 			if (uidp == NULL)
 				errExit("acl_get_qualifier");
 
-			pwd = getpwuid(uidp);
+			pwd = getpwuid(*uidp);
 			if (pwd == NULL)
 				errExit("getpwuid errno or can't find that user");
 
@@ -126,7 +138,7 @@ int main(int argc, char *argv[])
 
 			if (!strcmp(pwd->pw_name, name))
 			{
-				if (get_perms(perms, &entry, &permset, permVal) == -1)
+				if (get_perms(perms, &entry, &permset) == -1)
 					errExit("get_perms");
 				is_find = 1;
 				break;
@@ -138,7 +150,7 @@ int main(int argc, char *argv[])
 			if (gidp == NULL)
 				errExit("acl_get_qualifier");
 
-			grp = getgrgid(atoi(argv[2]));
+			grp = getgrgid(*gidp);
 			if (grp == NULL)
 				errExit("getpwuid errno or can't find that user");
 
@@ -147,15 +159,27 @@ int main(int argc, char *argv[])
 
 			if (!strcmp(grp->gr_name, name))
 			{
-				if (get_perms(perms, &entry, &permset, permVal) == -1)
+				if (get_perms(perms, &entry, &permset) == -1)
 					errExit("get_perms");
 				is_find = 1;
 				break;
 			}
 		}
 
-		if (tag == ACL_USER_OBJ || tag == ACL_GROUP_OBJ)
-			if (get_perms(obj_perms, &entry, &permset, permVal) == -1)
+		if (tag == ACL_USER_OBJ && is_user && !strcmp(name, user))
+		{
+			if (get_perms(obj_perms, &entry, &permset) == -1)
+				errExit("get_perms");
+			is_holder = 1;
+		}
+		if (tag == ACL_GROUP_OBJ && !is_user && !strcmp(name, group))
+		{
+			if (get_perms(obj_perms, &entry, &permset) == -1)
+				errExit("get_perms");
+			is_holder = 1;
+		}
+		if (tag == ACL_OTHER)
+			if (get_perms(other_perms, &entry, &permset) == -1)
 				errExit("get_perms");
 	}
 
@@ -164,8 +188,10 @@ int main(int argc, char *argv[])
 
 	if (is_find)
 		printf("%s\n", perms);
-	else
+	else if (is_holder)
 		printf("%s\n", obj_perms);
+	else
+		printf("%s\n", other_perms);
 
 	return 0;
 }
