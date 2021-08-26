@@ -51,7 +51,8 @@
 		"inet_sockets.h": "c",
 		"become_daemon.h": "c",
 		"ftw.h": "c",
-		"ugid_functions.h": "c"
+		"ugid_functions.h": "c",
+		"itimerspec_from_str.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }

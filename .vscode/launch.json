@@ -9,7 +9,7 @@
 			"type": "cppdbg",
 			"request": "launch",
 			"program": "${fileDirname}/${fileBasenameNoExtension}",
-			"args": [],
+			"args": ["100"],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/Exercise/23", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
