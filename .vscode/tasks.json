@@ -11,7 +11,7 @@
 				"${fileDirname}/${fileBasenameNoExtension}",
 				"-Wall",
 				"-ltlpi",
-				"-lacl"
+				"-lrt"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
