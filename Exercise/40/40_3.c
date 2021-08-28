@@ -175,3 +175,5 @@
 // 	perror(fname);
 // 	exit(EXIT_FAILURE);
 // }
+
+// And logout, logwtmp functions to implement.
