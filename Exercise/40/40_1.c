@@ -1,69 +1,43 @@
-#include <time.h>
-#include <lastlog.h>
-#include <paths.h> /* Definition of _PATH_LASTLOG */
-#include <fcntl.h>
-#include <pwd.h>
-#include "tlpi_hdr.h"
+#include <unistd.h>
+#include <utmpx.h>
+#include <string.h>
+#include <utmpx.h>
+#include <paths.h>
+#include <tlpi_hdr.h>
 
-uid_t userIdFromName(const char *name);
+#define MAX_USERLINE 32 // ut_line's size
+#define MAX_USERNAME 32 // ut_user's size
 
-int main(int argc, char *argv[])
+// Return the login name of the user.
+char *my_getlogin()
 {
-	struct lastlog llog;
-	int fd, j;
-	uid_t uid;
+	static char name[MAX_USERNAME];
+	char *linename;
+	struct utmpx *ut;
 
-	if (argc > 1 && strcmp(argv[1], "--help") == 0)
-		usageErr("%s [username...]\n", argv[0]);
+	if ((linename = ttyname(STDIN_FILENO)) == NULL)
+		return NULL;
 
-	fd = open(_PATH_LASTLOG, O_RDONLY);
-	if (fd == -1)
-		errExit("open");
-
-	for (j = 1; j < argc; j++)
-	{
-		uid = userIdFromName(argv[j]);
-		if (uid == -1)
+	setutxent();
+	while ((ut = getutxent()) != NULL)
+		if (!strncmp(linename + 5, ut->ut_line, MAX_USERLINE))
 		{
-			printf("No such user: %s\n", argv[j]);
-			continue;
+			strncpy(name, ut->ut_user, MAX_USERNAME);
+			endutxent();
+			return name;
 		}
-
-		if (lseek(fd, uid * sizeof(struct lastlog), SEEK_SET) == -1)
-			errExit("lseek");
-
-		if (read(fd, &llog, sizeof(struct lastlog)) <= 0)
-		{
-			printf("read failed for %s\n", argv[j]); /* EOF or error */
-			continue;
-		}
-
-		time_t ll_time = llog.ll_time;
-		printf("%-8.8s %-6.6s %-20.20s %s", argv[j], llog.ll_line,
-			   llog.ll_host, ctime((time_t *)&ll_time));
-	}
-
-	close(fd);
-	exit(EXIT_SUCCESS);
+	endutxent();
+	return NULL;
 }
 
-uid_t /* Return UID corresponding to 'name', or -1 on error */
-userIdFromName(const char *name)
+int main()
 {
-	struct passwd *pwd;
-	uid_t u;
-	char *endptr;
+	// Test:
+	char *name;
+	if ((name = my_getlogin()) == NULL)
+		errExit("getlogin");
 
-	if (name == NULL || *name == '\0') /* On NULL or empty string */
-		return -1;					   /* return an error */
+	printf("%s\n", name);
 
-	u = strtol(name, &endptr, 10); /* As a convenience to caller */
-	if (*endptr == '\0')		   /* allow a numeric string */
-		return u;
-
-	pwd = getpwnam(name);
-	if (pwd == NULL)
-		return -1;
-
-	return pwd->pw_uid;
+	return 0;
 }

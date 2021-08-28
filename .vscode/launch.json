@@ -11,7 +11,7 @@
 			"program": "${fileDirname}/${fileBasenameNoExtension}",
 			"args": ["100"],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/23", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/40", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",
