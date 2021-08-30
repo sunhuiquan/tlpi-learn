@@ -11,24 +11,13 @@ int main(int argc, char *argv[])
 {
 	int fd_a, fd_b;
 
-	fd_a = open("./a", O_RDONLY);
+	fd_a = open("./a", O_RDWR);
 	if (fd_a == -1)
 		errExit("open");
 
-	fd_b = open("./b", O_RDONLY);
+	fd_b = open("./b", O_RDWR);
 	if (fd_b == -1)
 		errExit("open");
-
-	printf("PID %ld: requesting file a at %s\n", (long)getpid(),
-		   currTime("%T"));
-	if (flock(fd_a, LOCK_EX) == -1)
-	{
-		if (errno == EWOULDBLOCK)
-			fatal("PID %ld: already locked file a !", (long)getpid());
-		else
-			errExit("File a flock (PID=%ld)", (long)getpid());
-	}
-	sleep(3);
 
 	printf("PID %ld: requesting file b at %s\n", (long)getpid(),
 		   currTime("%T"));
@@ -41,14 +30,15 @@ int main(int argc, char *argv[])
 	}
 	sleep(3);
 
+	printf("write强制性下要无别的进程有a的 flock锁，但write本身不持有锁\n");
+	if (write(fd_a, "a", 1) != 1) // 强制性锁让write会阻塞到无别的进程持有写锁的时候
+		errExit("write");
+	printf("write a成功\n");
+	sleep(3);
+
 	if (flock(fd_b, LOCK_UN) == -1)
 		errExit("flock");
 	printf("PID %ld: released file b at %s\n", (long)getpid(),
-		   currTime("%T"));
-
-	if (flock(fd_a, LOCK_UN) == -1)
-		errExit("flock");
-	printf("PID %ld: released file a at %s\n", (long)getpid(),
 		   currTime("%T"));
 
 	exit(EXIT_SUCCESS);
