@@ -10,7 +10,8 @@
 				"-o",
 				"${fileDirname}/${fileBasenameNoExtension}",
 				"-Wall",
-				"-ltlpi"
+				"-ltlpi",
+				"-ldl"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
