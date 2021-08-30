@@ -1241,7 +1241,8 @@ NOTE：有点不适的是对于 shm_open 关闭是 close，而删除又是 shm_u
 
 ### 55.4
 
-[代码](./Exercise/55/4)
+[代码](./Exercise/55/4/main.c) 运行可以看出 flock 文件锁和 fcntl 记录锁互相是不可见的(在 linux 上)，一点相互影响都没有(当然一些 UNIX 用 fcntl 实现 flock 的不是这样)。  
+我犯了个弱智错误，flock 文件锁 open 给个 read 权限就都行了，互斥锁不需要；而 fcntl 记录的读、写锁需要对应 open file 的权限，不然会 EABDF 错误。
 
 ### 55.5
 
