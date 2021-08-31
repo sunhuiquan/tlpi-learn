@@ -1,7 +1,7 @@
 # TLPI_learn_note
 
 My notes and solutions for The Linux Programing Interface (TLPI)  
-《UNIX/LINUX系统编程手册》笔记和解答
+《UNIX/LINUX 系统编程手册》笔记和解答
 
 （代码可以从 README 的超链接或者/Exercise 文件夹下对应章节数字找到）
 
@@ -860,7 +860,8 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 35.3
 
-[代码](./Exercise/35/3/main.c)
+[代码](./Exercise/35/3/main.c) CPU 时间是用户进程 CPU 时间和内核 CPU 时间之和，注意这是这个进程的 CPU 时间，不是实际时间，因为 Linux 是分时多任务系统，所以显然现实世界的一块时间的一小部分才是这个进程占据 CPU 为己所用的时间。  
+![IMG](./IMG/35_3.png)
 
 ### 35.4
 
