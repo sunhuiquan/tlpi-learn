@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include <sched.h>
 #include <time.h>
 #include <sys/times.h>
@@ -9,6 +11,12 @@ int main(int argc, char *argv[])
 {
 	pid_t pid;
 	struct sched_param sp;
+	cpu_set_t set;
+
+	CPU_ZERO(&set);
+	CPU_SET(0, &set); // 只能在CPU核0跑，单核，这样才能体现出来之后的FIFO实时调度
+
+	sched_setaffinity(0, sizeof(set), &set);
 
 	sp.sched_priority = 1;
 	if (sched_setscheduler(0, SCHED_FIFO, &sp) == -1)
@@ -46,6 +54,8 @@ int func()
 		return -1;
 	if (param.sched_priority == SCHED_FIFO)
 		printf("pid: %ld is SCHED_FIFO\n", (long)getpid());
+	else if (param.sched_priority == SCHED_OTHER)
+		printf("pid: %ld is SCHED_OTHER\n", (long)getpid());
 	else
 		return -1;
 
