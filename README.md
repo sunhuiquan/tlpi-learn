@@ -850,9 +850,15 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 35.1
 
+[代码](./Exercise/35/1/main.c)
+
 ### 35.2
 
+<!-- to do set-user-ID-root 程序忘记怎么写了，以后补上 -->
+
 ### 35.3
+
+[代码](./Exercise/35/3/main.c)
 
 ### 35.4
 
