@@ -1,6 +1,6 @@
 # TLPI_learn_note
 
-My notes and solutions for The Linux Programing Interface book  
+My notes and solutions for The Linux Programing Interface (TLPI)  
 《UNIX/LINUX系统编程手册》笔记和解答
 
 （代码可以从 README 的超链接或者/Exercise 文件夹下对应章节数字找到）
