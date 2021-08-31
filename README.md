@@ -856,7 +856,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 35.2
 
-<!-- to do set-user-ID-root 程序忘记怎么写了，以后补上 -->
+<!-- to do set-user-ID-root程序忘记怎么写了，以后补上 -->
 
 ### 35.3
 
@@ -865,7 +865,8 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 35.4
 
-### 35.5
+[代码](./Exercise/35/4/main.c) 管道(匿名)或者 FIFO 文件就是一块内存，和硬盘没任何关系，和共享内存本质基本一样，只是外在行为不一样。同 CPU 这样 CPU 高数缓冲器更好的利用，不同 CPU 为了一致性还需要失效缓冲的内容，降低效率。  
+![IMG](./IMG/35_4.png)
 
 ---
 
