@@ -1233,10 +1233,10 @@ NOTE：有点不适的是对于 shm_open 关闭是 close，而删除又是 shm_u
   ![IMG](./IMG/55_1a.png)
 
 - 55.1.b
-  ![IMG](./IMG/55_1b.png)
+  <!-- to do ![IMG](./IMG/55_1b.png)  -->
 
 - 55.1.c
-  LINUX和大部分UNIX都是这样，至于少部分的UNIX我是不知道了。
+  LINUX 和大部分 UNIX 都是这样，至于少部分的 UNIX 我是不知道了。
 
 ### 55.2
 
@@ -1253,6 +1253,9 @@ NOTE：有点不适的是对于 shm_open 关闭是 close，而删除又是 shm_u
 我犯了个弱智错误，flock 文件锁 open 给个 read 权限就都行了，互斥锁不需要；而 fcntl 记录的读、写锁需要对应 open file 的权限，不然会 EABDF 错误。
 
 ### 55.5
+
+[代码](./Exercise/55/5) 循环用来放大倍速便于观察  
+![IMG](./IMG/55_8.png) 发现的确是线性
 
 ### 55.6
 
