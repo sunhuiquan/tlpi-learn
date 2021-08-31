@@ -1,6 +1,8 @@
 # TLPI_learn_note
 
-《Linux/UNIX 系统编程手册》习题答案和部分笔记。
+My notes and solutions for The Linux Programing Interface book  
+《UNIX/LINUX系统编程手册》笔记和解答
+
 （代码可以从 README 的超链接或者/Exercise 文件夹下对应章节数字找到）
 
 ## Index
