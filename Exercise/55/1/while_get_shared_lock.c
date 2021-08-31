@@ -5,30 +5,59 @@
 
 #define BUF_SIZE 1000
 
+void while_request_shared_lock(int secs);
 char *currTime(const char *format);
 
-int main(int argc, char *argv[])
+int main()
+{
+	pid_t pid;
+
+	pid = fork();
+	switch (pid)
+	{
+	case -1:
+		errExit("fork");
+		break;
+
+	case 0: // child
+		sleep(1);
+		while_request_shared_lock(2);
+		break;
+
+	default: // parent
+		while_request_shared_lock(2);
+		break;
+	}
+
+	// never gets here
+	exit(EXIT_SUCCESS);
+}
+
+void while_request_shared_lock(int secs)
 {
 	int fd;
 
-	fd = open(argv[1], O_RDONLY); /* Open file to be locked */
+	fd = open("./file", O_RDONLY); /* Open file to be locked */
 	if (fd == -1)
 		errExit("open");
 
-	// if (flock(fd, LOCK_SH) == -1)
-	// {
-	// 	if (errno == EWOULDBLOCK)
-	// 		errExit("nonblock and already lock");
-	// 	else
-	// 		errExit("flock - LOCK_SH");
-	// }
-	// printf("PID %ld: have got shared at %s\n", (long)getpid(), currTime("%T"));
+	for (;;)
+	{
+		if (flock(fd, LOCK_SH) == -1)
+		{
+			if (errno == EWOULDBLOCK)
+				errExit("nonblock and already lock");
+			else
+				errExit("flock - LOCK_SH");
+		}
+		printf("PID %ld: have got shared at %s\n", (long)getpid(), currTime("%T"));
 
-	// if (flock(fd, LOCK_UN) == -1)
-	// 	errExit("flock - LOCK_UN");
-	// printf("PID %ld: have released shared at %s\n", (long)getpid(), currTime("%T"));
+		sleep(secs);
 
-	exit(EXIT_SUCCESS);
+		if (flock(fd, LOCK_UN) == -1)
+			errExit("flock - LOCK_UN");
+		printf("PID %ld: have released shared at %s\n", (long)getpid(), currTime("%T"));
+	}
 }
 
 char *currTime(const char *format)
