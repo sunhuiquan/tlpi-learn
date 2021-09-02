@@ -1,5 +1,5 @@
 {
-    "files.associations": {
+	"files.associations": {
 		"fcntl.h": "c",
 		"tlpi_hdr.h": "c",
 		"unistd.h": "c",
@@ -52,7 +52,8 @@
 		"become_daemon.h": "c",
 		"ftw.h": "c",
 		"ugid_functions.h": "c",
-		"itimerspec_from_str.h": "c"
+		"itimerspec_from_str.h": "c",
+		"tty_functions.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }

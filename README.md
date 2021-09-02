@@ -1410,7 +1410,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ## CH62 终端
 
-<!-- ### 62.1
+### 62.1
 
 [代码](./Exercise/62/1/main.c)
 
@@ -1424,7 +1424,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ### 62.4
 
-[代码](./Exercise/62/4/main.c) -->
+[代码](./Exercise/62/4/main.c)
 
 ---
 
