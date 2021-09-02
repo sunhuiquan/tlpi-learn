@@ -837,7 +837,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 注意挂起(Ctrl+z)/阻塞(比如I/O处理)/休眠状态(sleep)是S(这三个是一个东西)，而停止(SIGSTOP)状态是T，完全是另外一种东西；前者仍能处理信号，而后者不能，信号到来会放到pending，只有SIGCONT恢复后才可以从pending取出信号处理。  
 因为停止的时候不能处理信号，这样之前处于停止的进程，当会话控制进程断开与控制终端联系，内核发给控制进程SIGHUP和SIGCONT，控制进程一般是shell，会处理这个SIGHUP信号，会发给会话前台进程租的所有进程，而如果之前处于停止的进程收到SIGHUP会放到pending而无法处理，所以不能单发一个SIGHUP，而是发SIGHUP和SIGCONT来处理这种情况。
 
-### 34.1
+<!-- ### 34.1
 
 ### 34.2
 
@@ -859,7 +859,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 34.7
 
-[代码](./Exercise/34/7/main.c)
+[代码](./Exercise/34/7/main.c) -->
 
 ---
 
@@ -1409,6 +1409,22 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 ---
 
 ## CH62 终端
+
+<!-- ### 62.1
+
+[代码](./Exercise/62/1/main.c)
+
+### 62.2
+
+[代码](./Exercise/62/2/main.c)
+
+### 62.3
+
+[代码](./Exercise/62/3/main.c)
+
+### 62.4
+
+[代码](./Exercise/62/4/main.c) -->
 
 ---
 
