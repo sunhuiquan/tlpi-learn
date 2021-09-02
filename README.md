@@ -1416,7 +1416,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ### 62.2
 
-[代码](./Exercise/62/2/main.c) 查了半天没搞懂怎么通过fd和rdev找，结果看了看ttyname源码发现很简单。。。另外注意终端是字符设备，这很显然吧。。。  
+[代码](./Exercise/62/2) 查了半天没搞懂怎么通过fd和rdev找，结果看了看ttyname源码发现很简单。。。另外注意终端是字符设备，这很显然吧。。。  
 我用了nftw遍历，真的是为了方便反而更麻烦了，首先是API难用，然后是level要控制在1还损耗效率，然后离谱的是nftw自动是stat，我还要再一次通过目录项名字来lstat判断链接文件，无语了，用readdir这种简单的API反而更方便，效率高。
 
 ### 62.3
