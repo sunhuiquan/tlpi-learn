@@ -1421,7 +1421,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ### 62.3
 
-[代码](./Exercise/62/3/main.c)  给使用getpass的程序重定向STDIN_FILENO发现仍然要从终端读，应该通过/dev/tty的方式，但是那个行为和预期的不一样，搞不懂。
+[代码](./Exercise/62/3)  给使用getpass的程序重定向STDIN_FILENO发现仍然要从终端读，应该通过/dev/tty的方式，但是那个行为和预期的不一样，搞不懂。
 
 ### 62.4
 
