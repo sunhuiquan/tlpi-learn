@@ -861,7 +861,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 34.6
 
-[代码](./Exercise/34/6/main.c)
+[代码](./Exercise/34/6/main.c) 当一个进程组变成孤儿进程组的时候，会成为后台进程组，从而如果read终端会EIO。
 
 ### 34.7
 
