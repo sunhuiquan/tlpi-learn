@@ -853,9 +853,11 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 34.4
 
-[代码](./Exercise/34/4/main.c)
+[代码](./Exercise/34/4/main.c) 这个我可能没理解对题意。。
 
 ### 34.5
+
+设置SIG_IGN后raise前来了个SIGTSTP会停止，SIGCONT后立即又raise(SIGTSTP)导致又停止，需要两个SIGCONT；或是raise(SIGTSTP)后加掩码前又来SIGTSTP，这样也是需要两个SIGCONT。
 
 ### 34.6
 
