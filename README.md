@@ -848,7 +848,8 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 34.3
 
-[代码](./Exercise/34/3/main.c)
+[代码](./Exercise/34/3/main.c)  
+![IMG](./IMG/34_3.png)
 
 ### 34.4
 
