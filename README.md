@@ -837,11 +837,14 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 注意挂起(Ctrl+z)/阻塞(比如I/O处理)/休眠状态(sleep)是S(这三个是一个东西)，而停止(SIGSTOP)状态是T，完全是另外一种东西；前者仍能处理信号，而后者不能，信号到来会放到pending，只有SIGCONT恢复后才可以从pending取出信号处理。  
 因为停止的时候不能处理信号，这样之前处于停止的进程，当会话控制进程断开与控制终端联系，内核发给控制进程SIGHUP和SIGCONT，控制进程一般是shell，会处理这个SIGHUP信号，会发给会话前台进程租的所有进程，而如果之前处于停止的进程收到SIGHUP会放到pending而无法处理，所以不能单发一个SIGHUP，而是发SIGHUP和SIGCONT来处理这种情况。
 
-<!-- ### 34.1
+### 34.1
+
+如果使用管道，那么这几个进程都是同一个进程组的，向前台进程组发会发给管道连接的另外几个进程造成误差。可以通过保持个子进程pid数字来一个一个对进程发信号。
 
 ### 34.2
 
-[代码](./Exercise/34/2/main.c)
+[代码](./Exercise/34/2/main.c)  
+![IMG](./IMG/34_2.png)
 
 ### 34.3
 
@@ -859,7 +862,7 @@ if(!pthread_equal(tid, pthread_self())) // 确保tid不是该线程自己的POSI
 
 ### 34.7
 
-[代码](./Exercise/34/7/main.c) -->
+[代码](./Exercise/34/7/main.c)
 
 ---
 
