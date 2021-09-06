@@ -947,7 +947,7 @@ manpage 上写的多清楚，书上一开始写的有点误导(虽然后面仔�
 直接给我整蒙了，原来现在库函数改了，要链接-lcrypt库，然后#include <crypt.h>。
 
 [代码](./Exercise/38/2/38_2.c) getpwnam()和getspnam()然后与用相同密钥单向加密crypt()比较，可以实现登录功能，真的神奇。  
-![IMG](./IMG/38_1.png)
+![IMG](./IMG/38_2.png)
 
 ---
 
