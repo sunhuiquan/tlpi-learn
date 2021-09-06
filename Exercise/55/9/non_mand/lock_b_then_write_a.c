@@ -10,6 +10,7 @@ char *currTime(const char *format);
 int main(int argc, char *argv[])
 {
 	int fd_a, fd_b;
+	struct flock fl;
 
 	fd_a = open("./a", O_RDWR);
 	if (fd_a == -1)
@@ -19,27 +20,36 @@ int main(int argc, char *argv[])
 	if (fd_b == -1)
 		errExit("open");
 
+	fl.l_len = 0;
+	fl.l_start = 0;
+	fl.l_whence = SEEK_SET;
+	fl.l_type = F_WRLCK;
+
 	printf("PID %ld: requesting file b at %s\n", (long)getpid(),
 		   currTime("%T"));
-	if (flock(fd_b, LOCK_EX) == -1)
+	if (fcntl(fd_b, F_SETLK, &fl) == -1)
 	{
-		if (errno == EWOULDBLOCK)
-			fatal("PID %ld: already locked file b !", (long)getpid());
+		if (errno == EAGAIN || errno == EACCES)
+			printf("already locked");
+		else if (errno == EDEADLK)
+			printf("dead lock");
 		else
-			errExit("File b flock (PID=%ld)", (long)getpid());
+			errExit("fcntl");
 	}
+	printf("PID %ld: have got write lock b at %s\n", (long)getpid(), currTime("%T"));
 	sleep(3);
 
-	printf("write强制性下要无别的进程有a的 flock锁，但write本身不持有锁\n");
+	printf("write强制性下要无别的进程有a的记录锁，但write本身不持有锁\n");
 	if (write(fd_a, "a", 1) != 1) // 强制性锁让write会阻塞到无别的进程持有写锁的时候
 		errExit("write");
 	printf("write a成功\n");
 	sleep(3);
 
-	if (flock(fd_b, LOCK_UN) == -1)
-		errExit("flock");
-	printf("PID %ld: released file b at %s\n", (long)getpid(),
-		   currTime("%T"));
+	fl.l_type = F_UNLCK;
+	if (fcntl(fd_b, F_SETLK, &fl) == -1)
+		errExit("fcntl");
+	else
+		printf("PID %ld: have released write lock b at %s\n", (long)getpid(), currTime("%T"));
 
 	exit(EXIT_SUCCESS);
 }
