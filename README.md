@@ -1307,6 +1307,10 @@ NOTE：有点不适的是对于 shm_open 关闭是 close，而删除又是 shm_u
 
 ## CH55 文件加锁
 
+### NOTE CH55
+
+mount -o remount,xxx /dir 这种形式，如果需要清除后面加的就把,xxx去为空即可。
+
 ### 55.1
 
 - 55.1.a
@@ -1353,7 +1357,7 @@ NOTE：有点不适的是对于 shm_open 关闭是 close，而删除又是 shm_u
 
 ### 55.9
 
-[代码](./Exercise/55/9) 我挂载了-B -o mand 但是没用，因为我第一次用了flock锁，flock锁不支持强制式锁，fcntl记录锁才能支持。  
+[代码](./Exercise/55/9) 我挂载了-B -o mand 但是没用，因为我第一次用了flock锁，flock锁不支持强制式锁，fcntl记录锁才能支持（第一次挂载我mand属性也没加上，后面-o remount,mand成功了）。  
 注意g+s,g-x是加到文件的属性，是文件的权限位,不是可执行文件的权限！  
 ![IMG](./IMG/55_9a.png) 未开启强制式文件锁，未死锁  
 ![IMG](./IMG/55_9b.png) 挂载mond属性，开启强制式文件锁，死锁
