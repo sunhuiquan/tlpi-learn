@@ -79,11 +79,14 @@ int main(int argc, char *argv[])
 			openlog(identy, LOG_PID, facility);
 		else
 			openlog(NULL, LOG_PID, facility);
-		// syslog(level, "%s", msg);
 	}
 
 	if (optind == argc - 1)
+		syslog(level, "%s", argv[optind]);
+	else
 	{
+		printf("%s usage: [-i ident] [-f facility] [-l level] <msg>", argv[0]);
+		exit(EXIT_FAILURE);
 	}
 
 	return 0;
