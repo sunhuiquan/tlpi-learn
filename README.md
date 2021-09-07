@@ -1319,7 +1319,11 @@ mount -o remount,xxx /dir 这种形式，如果需要清除后面加的就把,xx
   ![IMG](./IMG/55_1a.png)
 
 - 55.1.b
-  <!-- to do ![IMG](./IMG/55_1b.png)  -->
+
+？？？ 为什么么体现的都是FIFO ？？？
+<!-- ![IMG](./IMG/55_1b1.png) 展示flock排队加锁是随机一个请求进程获取而不是FIFO。  
+![IMG](./IMG/55_1b2.png) 展示fcntl排队加锁是随机一个请求进程获取而不是FIFO。 -->
+  
 
 - 55.1.c
   LINUX 和大部分 UNIX 都是这样，至于少部分的 UNIX 我是不知道了。
@@ -1364,6 +1368,8 @@ mount -o remount,xxx /dir 这种形式，如果需要清除后面加的就把,xx
 ![IMG](./IMG/55_9b.png) 挂载mond属性，开启强制式文件锁，死锁
 
 ### 55.10
+
+没看懂要我实现什么，暂时不做了。。。
 
 ---
 
