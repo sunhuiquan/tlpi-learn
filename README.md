@@ -1324,7 +1324,6 @@ mount -o remount,xxx /dir 这种形式，如果需要清除后面加的就把,xx
 <!-- ![IMG](./IMG/55_1b1.png) 展示flock排队加锁是随机一个请求进程获取而不是FIFO。  
 ![IMG](./IMG/55_1b2.png) 展示fcntl排队加锁是随机一个请求进程获取而不是FIFO。 -->
   
-
 - 55.1.c
   LINUX 和大部分 UNIX 都是这样，至于少部分的 UNIX 我是不知道了。
 
