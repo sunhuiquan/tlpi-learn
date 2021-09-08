@@ -1450,7 +1450,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ### 61.1
 
-[代码](./Exercise/61/1)
+[代码](./Exercise/61/1) netstat默认不显示Listen我还以为出bug了。。
 
 ### 61.2
 

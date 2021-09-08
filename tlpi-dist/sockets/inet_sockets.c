@@ -11,7 +11,6 @@
 /* Listing 59-9 */
 
 /* inet_sockets.c
-
    A package of useful routines for Internet domain sockets.
 */
 #define _BSD_SOURCE /* To get NI_MAXHOST and NI_MAXSERV \
@@ -25,7 +24,6 @@
 
 /* The following arguments are common to several of the routines
    below:
-
         'host':         NULL for loopback IP address, or
                         a host name or numeric IP address
         'service':      either a name or a port number

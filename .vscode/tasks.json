@@ -10,8 +10,8 @@
 				"-o",
 				"${fileDirname}/${fileBasenameNoExtension}",
 				"-Wall",
-				"-ltlpi",
-				"-lcrypt"
+				"-ltlpi"
+				// "-linet_sockets"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
