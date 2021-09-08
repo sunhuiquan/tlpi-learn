@@ -54,7 +54,8 @@
 		"ugid_functions.h": "c",
 		"itimerspec_from_str.h": "c",
 		"tty_functions.h": "c",
-		"myttyname.h": "c"
+		"myttyname.h": "c",
+		"ind.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
