@@ -1,3 +1,3 @@
 #!/bin/bash
 
-alias cmt='git add ./;git commit -m "add"'
+alias cmt='git add /home/water/work/tlpi-learn/;git commit -m "add"'
