@@ -5,6 +5,7 @@
 #include "shell_h.h"
 
 void serve_func(int connfd);
+void _exit_write(char *msg);
 
 int main()
 {
@@ -55,21 +56,28 @@ int main()
 void serve_func(int connfd)
 {
 	int readn;
-	char buf[MAXLINE], command[MAXLINE];
+	char buf[MAXLINE], command[MAXLINE], buf2[MAXLINE + 100];
 	if (dup2(connfd, STDOUT_FILENO) == -1)
-		err_exit("dup2");
+		_exit_write("dup2");
 	if (dup2(STDOUT_FILENO, STDERR_FILENO) == -1)
-		err_exit("dup2");
+		_exit_write("dup2");
 
 	command[0] = '\0';
 	while ((readn = read(connfd, buf, MAXLINE)) > 0)
 		strncpy(command, buf, MAXLINE);
 	if (readn < 0)
-		err_exit("read");
+		_exit_write("read");
 
-	printf("command: %s\n", command);
-	// write(connfd, buf, strlen(buf));
-	// 执行
+	snprintf(buf2, MAXLINE + 100, "Excute \"%s\" command:\n", command);
+	if (write(STDOUT_FILENO, buf2, strlen(buf2)) != strlen(buf2))
+		_exit_write("write");
+	system(command);
 
 	return;
+}
+
+void _exit_write(char *msg)
+{
+	write(STDOUT_FILENO, msg, strlen(msg));
+	_exit(EXIT_FAILURE);
 }
