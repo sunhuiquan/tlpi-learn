@@ -20,9 +20,7 @@ int main()
 
 	if (bind(lfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 		errExit("bind");
-
-	pr_sockname_inet4(lfd, &addr);
-
+	// pr_sockname_inet4(lfd, &addr); // 打印验证下是不是绑定没问题
 	if (listen(lfd, 10) == -1)
 		errExit("listen");
 
@@ -39,6 +37,7 @@ int main()
 
 		case 0:
 			close(lfd);
+
 			_exit(EXIT_SUCCESS);
 			break;
 
