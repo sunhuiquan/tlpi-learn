@@ -4,6 +4,8 @@
 #include <tlpi_hdr.h>
 #include "shell_h.h"
 
+void serve_func(int connfd);
+
 int main()
 {
 	int lfd, connfd;
@@ -37,7 +39,7 @@ int main()
 
 		case 0:
 			close(lfd);
-
+			serve_func(connfd);
 			_exit(EXIT_SUCCESS);
 			break;
 
@@ -48,4 +50,26 @@ int main()
 	}
 
 	return 0;
+}
+
+void serve_func(int connfd)
+{
+	int readn;
+	char buf[MAXLINE], command[MAXLINE];
+	if (dup2(connfd, STDOUT_FILENO) == -1)
+		err_exit("dup2");
+	if (dup2(STDOUT_FILENO, STDERR_FILENO) == -1)
+		err_exit("dup2");
+
+	command[0] = '\0';
+	while ((readn = read(connfd, buf, MAXLINE)) > 0)
+		strncpy(command, buf, MAXLINE);
+	if (readn < 0)
+		err_exit("read");
+
+	printf("command: %s\n", command);
+	// write(connfd, buf, strlen(buf));
+	// 执行
+
+	return;
 }
