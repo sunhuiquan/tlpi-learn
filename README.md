@@ -1458,7 +1458,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ### 61.3
 
-[代码](./Exercise/61/3)
+[代码](./Exercise/61/3/my_sendfile.c) 题目有点无语的是，这样实现只是模仿外在行为而已，根本没有比read、write性能提高。。。另外实际的sendfile的目的还必须是socket，而这道题显然没必要，就随便写了。
 
 ### 61.4
 
