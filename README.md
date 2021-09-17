@@ -1450,7 +1450,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ### 61.1
 
-[代码](./Exercise/61/1) netstat默认不显示Listen我还以为出bug了。。
+如果write写入非常大量的数据，服务端会把从发向服务器的缓冲区数据读取并写入发向客户端的缓冲区，但发向客户端的缓冲区的数据要等到write完成，如果write写入非常大量数据，那么最终会把双向的缓冲区都填满，导致死锁。
 
 ### 61.2
 
