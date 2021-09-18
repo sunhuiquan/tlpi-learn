@@ -41,14 +41,26 @@ int main(int argc, char *argv[])
 	if (getsockname(lfd, (struct sockaddr *)&addr, &len) == -1)
 		errExit("getsockname");
 
-	if (write(sfd, (char *)&addr.sin_port, sizeof(addr.sin_port)) != sizeof(addr.sin_port))
+	if (write(sfd, &addr.sin_port, sizeof(addr.sin_port)) != sizeof(addr.sin_port))
 		errExit("write");
 
 	if ((prior_sfd = accept(lfd, NULL, NULL)) == -1)
 		errExit("accept");
+	close(lfd); // because it is never userd anymore
 
-	close(lfd);
-
+	// 交错发送普通和优先数据
+	if (write(sfd, "aaaaaaaaaa", 10) != 10)
+		errExit("send");
+	if (write(prior_sfd, "bbbbbbbbbb", 10) != 10)
+		errExit("send");
+	if (write(sfd, "aaaaaaaaaa", 10) != 10)
+		errExit("send");
+	if (write(prior_sfd, "bbbbbbbbbb", 10) != 10)
+		errExit("send");
+	if (write(sfd, "aaaaaaaaaa", 10) != 10)
+		errExit("send");
+	if (write(prior_sfd, "bbbbbbbbbb", 10) != 10)
+		errExit("send");
 	if (write(sfd, "aaaaaaaaaa", 10) != 10)
 		errExit("send");
 	if (write(prior_sfd, "bbbbbbbbbb", 10) != 10)

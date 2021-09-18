@@ -6,13 +6,14 @@
 #define PORT_NUMBER 9990
 #define MAXLINE 1024
 
-void serve_func(int connfd);
+void serve_func(int connfd, struct sockaddr_in *addr);
 void _exit_write(char *msg);
 
 int main()
 {
 	int lfd, connfd;
-	struct sockaddr_in addr;
+	struct sockaddr_in addr, cli_addr;
+	socklen_t cli_len;
 
 	if ((lfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		errExit("socket");
@@ -29,7 +30,8 @@ int main()
 
 	while (true)
 	{
-		if ((connfd = accept(lfd, NULL, NULL)) == -1)
+		cli_len = sizeof(cli_addr);
+		if ((connfd = accept(lfd, (struct sockaddr *)&cli_addr, &cli_len)) == -1)
 			errExit("accept");
 
 		switch (fork())
@@ -40,7 +42,7 @@ int main()
 
 		case 0:
 			close(lfd);
-			serve_func(connfd);
+			serve_func(connfd, &cli_addr);
 			_exit(EXIT_SUCCESS);
 			break;
 
@@ -53,9 +55,22 @@ int main()
 	return 0;
 }
 
-void serve_func(int connfd)
+void serve_func(int connfd, struct sockaddr_in *addr)
 {
-	// to do
+	int prior_connfd;
+
+	if ((prior_connfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		errExit("socket");
+
+	// 除了port，其他的不需要变
+	if (read(connfd, &addr->sin_port, sizeof(addr->sin_port)) != sizeof(addr->sin_port))
+		_exit_write("read");
+
+	if (connect(prior_connfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+		errExit("connect");
+
+	// connect返回后就建立了两条连接了
+	sleep(5); // 为了体现出如果同时到了两种数据我们会先处理优先数据
 }
 
 void _exit_write(char *msg)
