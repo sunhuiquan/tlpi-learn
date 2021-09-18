@@ -13,12 +13,6 @@ int main(int argc, char *argv[])
 	socklen_t len;
 	char buf[MAXLINE];
 
-	if (argc != 2)
-	{
-		printf("%s usage: <shell-command> \n", argv[0]);
-		exit(EXIT_FAILURE);
-	}
-
 	// 1. 建立普通TCP连接
 	if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		errExit("socket");
