@@ -1,5 +1,4 @@
-#include <sys/socket.h>
-#include <sys/types.h>
+// #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <tlpi_hdr.h>
 
@@ -8,10 +7,9 @@
 
 int main(int argc, char *argv[])
 {
-	int sfd, readn, prior_sfd, lfd;
-	struct sockaddr_in addr, addr2, addr3;
+	int sfd, prior_sfd, lfd;
+	struct sockaddr_in addr;
 	socklen_t len;
-	char buf[MAXLINE];
 
 	// 1. 建立普通TCP连接
 	if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -29,20 +27,21 @@ int main(int argc, char *argv[])
 	if ((lfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		errExit("socket");
 
-	bzero(&addr2, sizeof(addr2));
-	addr2.sin_family = AF_INET;
-	addr2.sin_addr.s_addr = htonl(INADDR_ANY);
-	if (bind(lfd, (struct sockaddr *)&addr2, sizeof(addr2)) == -1)
+	bzero(&addr, sizeof(addr));
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if (bind(lfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 		errExit("bind");
 
 	if (listen(lfd, 10) == -1)
 		errExit("listen");
 
-	len = sizeof(addr3); // 获取listen()让内核分配的临时端口并发送
-	if (getsockname(lfd, (struct sockaddr *)&addr3, &len) == -1)
+	bzero(&addr, sizeof(addr)); // 反正bind或者connect用完这个结构就没用了，那就再重用下
+	len = sizeof(addr);			// 获取listen()让内核分配的临时端口并发送
+	if (getsockname(lfd, (struct sockaddr *)&addr, &len) == -1)
 		errExit("getsockname");
 
-	if (write(sfd, addr3.sin_port, sizeof(addr3.sin_port)) != sizeof(addr3.sin_port))
+	if (write(sfd, (char *)&addr.sin_port, sizeof(addr.sin_port)) != sizeof(addr.sin_port))
 		errExit("write");
 
 	if ((prior_sfd = accept(lfd, NULL, NULL)) == -1)
