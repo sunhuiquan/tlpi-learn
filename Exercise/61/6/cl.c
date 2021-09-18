@@ -8,8 +8,9 @@
 
 int main(int argc, char *argv[])
 {
-	int sfd, readn;
-	struct sockaddr_in addr;
+	int sfd, readn, prior_sfd, lfd;
+	struct sockaddr_in addr, addr2, addr3;
+	socklen_t len;
 	char buf[MAXLINE];
 
 	if (argc != 2)
@@ -18,6 +19,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	// 1. 建立普通TCP连接
 	if ((sfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		errExit("socket");
 
@@ -29,7 +31,34 @@ int main(int argc, char *argv[])
 	if (connect(sfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 		errExit("connect");
 
-	// to do
+	// 2. 建立优先TCP连接
+	if ((lfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+		errExit("socket");
 
+	bzero(&addr2, sizeof(addr2));
+	addr2.sin_family = AF_INET;
+	addr2.sin_addr.s_addr = htonl(INADDR_ANY);
+	if (bind(lfd, (struct sockaddr *)&addr2, sizeof(addr2)) == -1)
+		errExit("bind");
+
+	if (listen(lfd, 10) == -1)
+		errExit("listen");
+
+	len = sizeof(addr3); // 获取listen()让内核分配的临时端口并发送
+	if (getsockname(lfd, (struct sockaddr *)&addr3, &len) == -1)
+		errExit("getsockname");
+
+	if (write(sfd, addr3.sin_port, sizeof(addr3.sin_port)) != sizeof(addr3.sin_port))
+		errExit("write");
+
+	if ((prior_sfd = accept(lfd, NULL, NULL)) == -1)
+		errExit("accept");
+
+	close(lfd);
+
+	if (write(sfd, "aaaaaaaaaa", 10) != 10)
+		errExit("send");
+	if (write(prior_sfd, "bbbbbbbbbb", 10) != 10)
+		errExit("send");
 	return 0;
 }
