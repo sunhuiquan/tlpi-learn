@@ -56,7 +56,8 @@
 		"tty_functions.h": "c",
 		"myttyname.h": "c",
 		"ind.h": "c",
-		"shell_h.h": "c"
+		"shell_h.h": "c",
+		"inet.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }

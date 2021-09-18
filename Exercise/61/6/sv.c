@@ -2,7 +2,9 @@
 #include <sys/types.h>
 #include <arpa/inet.h>
 #include <tlpi_hdr.h>
-#include "shell_h.h"
+
+#define PORT_NUMBER 9990
+#define MAXLINE 1024
 
 void serve_func(int connfd);
 void _exit_write(char *msg);
@@ -19,10 +21,9 @@ int main()
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(PORT_NUMBER);
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
-
 	if (bind(lfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 		errExit("bind");
-	// pr_sockname_inet4(lfd, &addr); // 打印验证下是不是绑定没问题
+
 	if (listen(lfd, 10) == -1)
 		errExit("listen");
 
@@ -54,25 +55,7 @@ int main()
 
 void serve_func(int connfd)
 {
-	int readn;
-	char buf[MAXLINE], command[MAXLINE], buf2[MAXLINE + 100];
-	if (dup2(connfd, STDOUT_FILENO) == -1)
-		_exit_write("dup2");
-	if (dup2(STDOUT_FILENO, STDERR_FILENO) == -1)
-		_exit_write("dup2");
-
-	command[0] = '\0';
-	while ((readn = read(connfd, buf, MAXLINE)) > 0)
-		strncpy(command, buf, MAXLINE);
-	if (readn < 0)
-		_exit_write("read");
-
-	snprintf(buf2, MAXLINE + 100, "Excute \"%s\" command:\n", command);
-	if (write(STDOUT_FILENO, buf2, strlen(buf2)) != strlen(buf2))
-		_exit_write("write");
-	system(command);
-
-	return;
+	// to do
 }
 
 void _exit_write(char *msg)
