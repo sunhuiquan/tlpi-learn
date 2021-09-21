@@ -1,8 +1,7 @@
-// #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <tlpi_hdr.h>
 
-#define PORT_NUMBER 9990
+#define PORT_NUMBER 9999
 #define MAXLINE 1024
 
 int main(int argc, char *argv[])

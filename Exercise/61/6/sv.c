@@ -3,13 +3,27 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <time.h> // struct time_val
+#include <sys/wait.h>
 #include <tlpi_hdr.h>
 
-#define PORT_NUMBER 9990
+#define PORT_NUMBER 9999
 #define MAXLINE 1024
 
 void serve_func(int connfd, struct sockaddr_in *addr);
 void _exit_write(char *msg);
+
+void sigchlild_handle(int sig);
+
+// using it for testing *******************************************************
+int pr_sockname_inet4(struct sockaddr_in *addr)
+{
+	char addrstr[INET_ADDRSTRLEN];
+	if (inet_ntop(AF_INET, &addr->sin_addr, addrstr, sizeof(addrstr)) == NULL)
+		return -1;
+	printf("%s : %u\n", addrstr, ntohs(addr->sin_port));
+	return 0;
+}
+// ****************************************************************************
 
 int main()
 {
@@ -66,11 +80,19 @@ void serve_func(int connfd, struct sockaddr_in *addr)
 	if ((prior_connfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		_exit_write("socket");
 
+	// ************************
+	pr_sockname_inet4(addr);
+	// ************************
+
 	// 除了port，其他的不需要变
 	if (read(connfd, &addr->sin_port, sizeof(addr->sin_port)) != sizeof(addr->sin_port))
 		_exit_write("read");
 
-	if (connect(prior_connfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
+	// ************************
+	pr_sockname_inet4(addr);
+	// ************************
+
+	if (connect(prior_connfd, (struct sockaddr *)addr, sizeof(*addr)) == -1)
 		_exit_write("connect");
 
 	// connect返回后就建立了两条连接了
@@ -122,6 +144,18 @@ void serve_func(int connfd, struct sockaddr_in *addr)
 
 void _exit_write(char *msg)
 {
+	char *perr_str = strdup(strerror(errno));
 	write(STDOUT_FILENO, msg, strlen(msg));
+	if (perr_str)
+		write(STDOUT_FILENO, perr_str, sizeof(perr_str));
+	// 因为直接终止了，所以没有释放空间
 	_exit(EXIT_FAILURE);
+}
+
+void sigchlild_handle(int sig)
+{
+	int err = errno;
+	while (waitpid(-1, NULL, WNOHANG) > 0)
+		;
+	errno = err;
 }
