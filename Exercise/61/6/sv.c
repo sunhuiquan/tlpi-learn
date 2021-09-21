@@ -11,19 +11,17 @@
 
 void serve_func(int connfd, struct sockaddr_in *addr);
 void _exit_write(char *msg);
-
 void sigchlild_handle(int sig);
 
-// using it for testing *******************************************************
-int pr_sockname_inet4(struct sockaddr_in *addr)
-{
-	char addrstr[INET_ADDRSTRLEN];
-	if (inet_ntop(AF_INET, &addr->sin_addr, addrstr, sizeof(addrstr)) == NULL)
-		return -1;
-	printf("%s : %u\n", addrstr, ntohs(addr->sin_port));
-	return 0;
-}
-// ****************************************************************************
+// using it for testing
+// int pr_sockname_inet4(struct sockaddr_in *addr)
+// {
+// 	char addrstr[INET_ADDRSTRLEN];
+// 	if (inet_ntop(AF_INET, &addr->sin_addr, addrstr, sizeof(addrstr)) == NULL)
+// 		return -1;
+// 	printf("%s : %u\n", addrstr, ntohs(addr->sin_port));
+// 	return 0;
+// }
 
 int main()
 {
@@ -74,32 +72,36 @@ int main()
 void serve_func(int connfd, struct sockaddr_in *addr)
 {
 	int prior_connfd, readn, close_connfd, close_prior_connfd;
+	int64_t cookie;
 	fd_set rfdset;
 	char buf[MAXLINE];
+
+	if (read(connfd, &cookie, sizeof(cookie)) != sizeof(cookie))
+		errExit("read");
 
 	if ((prior_connfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		_exit_write("socket");
 
-	// ************************
-	pr_sockname_inet4(addr);
-	// ************************
+	// pr_sockname_inet4(addr);
 
 	// 除了port，其他的不需要变
 	if (read(connfd, &addr->sin_port, sizeof(addr->sin_port)) != sizeof(addr->sin_port))
 		_exit_write("read");
 
-	// ************************
-	pr_sockname_inet4(addr);
-	// ************************
+	// pr_sockname_inet4(addr);
 
 	if (connect(prior_connfd, (struct sockaddr *)addr, sizeof(*addr)) == -1)
 		_exit_write("connect");
+
+	if (write(prior_connfd, &cookie, sizeof(cookie)) != sizeof(cookie))
+		_exit_write("write");
 
 	// connect返回后就建立了两条连接了
 	sleep(5); // 为了体现出如果同时到了两种数据我们会先处理优先数据
 
 	close_connfd = 0;
 	close_prior_connfd = 0;
+
 	FD_ZERO(&rfdset);
 	while (true)
 	{
@@ -125,6 +127,12 @@ void serve_func(int connfd, struct sockaddr_in *addr)
 				close_prior_connfd = 1;
 				FD_CLR(prior_connfd, &rfdset);
 			}
+
+			if (write(STDOUT_FILENO, buf, readn) != readn)
+			{
+				_exit_write("write");
+				// continue;
+			}
 		}
 
 		if (FD_ISSET(connfd, &rfdset))
@@ -137,6 +145,9 @@ void serve_func(int connfd, struct sockaddr_in *addr)
 				close_connfd = 1;
 				FD_CLR(connfd, &rfdset);
 			}
+
+			if (write(STDOUT_FILENO, buf, readn) != readn)
+				_exit_write("write");
 		}
 	}
 	return;
