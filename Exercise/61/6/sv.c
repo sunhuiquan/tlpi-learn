@@ -131,7 +131,7 @@ void serve_func(int connfd, struct sockaddr_in *addr)
 			if (write(STDOUT_FILENO, buf, readn) != readn)
 			{
 				_exit_write("write");
-				// continue;
+				continue;
 			}
 		}
 
