@@ -64,7 +64,7 @@ My notes and solutions for The Linux Programing Interface (TLPI)
 - [CH60 SOCKET 服务器设计](#CH60-SOCKET-服务器设计)
 - [CH61 SOCKET 高级主题](#CH61-SOCKET-高级主题)
 - [CH62 终端](#CH62-终端)
-- [CH63 其他备选的 I/O 模型](#CH63-其他备选的-I/O-模型)
+- [CH63 其他备选的 I/O 模型](#CH63-其他备选的-io-模型)
 - [CH64 伪终端](#CH64-伪终端)
 
 ## 环境搭建
