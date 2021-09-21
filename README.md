@@ -64,7 +64,7 @@ My notes and solutions for The Linux Programing Interface (TLPI)
 - [CH60 SOCKET 服务器设计](#CH60-SOCKET-服务器设计)
 - [CH61 SOCKET 高级主题](#CH61-SOCKET-高级主题)
 - [CH62 终端](#CH62-终端)
-- [CH63 其他备选的 I/O 模型](#CH63-其他备选的I/O模型)
+- [CH63 其他备选的 I/O 模型](#CH63-其他备选的-I/O-模型)
 - [CH64 伪终端](#CH64-伪终端)
 
 ## 环境搭建
@@ -1505,6 +1505,22 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 ---
 
 ## CH63 其他备选的 I/O 模型
+
+### 63.1
+
+### 63.2
+
+### 63.3
+
+### 63.4
+
+### 63.5
+
+### 63.6
+
+### 63.7
+
+### 63.8
 
 ---
 
