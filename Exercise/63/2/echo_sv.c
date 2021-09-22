@@ -5,13 +5,20 @@
 #include <sys/select.h>
 #include <tlpi_hdr.h>
 
+#define BUF_SIZE 1024 // 可以通过调小这个缓冲区来更好地体现I/O多路复用的并发性
+
 int main()
 {
 	int lfd, dfd; // listen fd and datagram fd
 	struct sockaddr_in addr;
+	struct sockaddr_in from_addr;
+	socklen_t len;
 
 	int nfds, nready;
 	fd_set rfdset;
+
+	int readn;
+	char buf[BUF_SIZE];
 
 	// create a listening fd
 	if ((lfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -59,6 +66,16 @@ int main()
 
 		if (FD_ISSET(dfd, &rfdset)) // can read the datagram fd
 		{
+			len = sizeof(from_addr);
+			// 数据报socket read返回0可能是对端发来了空消息
+			if ((readn = recvfrom(dfd, buf, BUF_SIZE, MSG_DONTWAIT,
+								  (struct sockaddr *)&from_addr, &len)) == -1)
+				errExit("recvfrom");
+
+			if (sendto(dfd, buf, readn, MSG_DONTWAIT,
+					   (struct sockaddr *)&from_addr, len) != readn)
+				errExit("sendto");
+
 			--nready;
 			if (!nready)
 				continue;
