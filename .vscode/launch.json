@@ -5,13 +5,13 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "gcc-9 - 生成和调试活动文件",
+			"name": "gcc-9",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/${fileBasenameNoExtension}",
+			"program": "${fileDirname}/echo_sv.out",
 			"args": [],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/61/5", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/63/2", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",
@@ -22,7 +22,7 @@
 					"ignoreFailures": true
 				}
 			],
-			"preLaunchTask": "C/C++: gcc-9 生成活动文件",
+			"preLaunchTask": "C/C++: gcc-9",
 			"miDebuggerPath": "/usr/bin/gdb"
 		}
 	]
