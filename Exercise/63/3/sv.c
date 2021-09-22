@@ -1,14 +1,28 @@
 #include <sys/select.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <sys/stat.h>
 #include <tlpi_hdr.h>
 
 #define MAXLINE 1024
+#define MAX_MTEXT 1024
+
+struct mbuf
+{
+	long mtype;
+	char mtext[MAX_MTEXT];
+};
 
 int main()
 {
-	int pid, maxfd, readn;
+	int pid, maxfd, readn, msglen;
 	int pfd[2];
 	fd_set rfdset;
 	char buf[MAXLINE];
+
+	int msqid; // 这个不是fd注意
+	struct mbuf msg;
 
 	if (pipe(pfd) == -1)
 		errExit("pipe");
@@ -18,9 +32,20 @@ int main()
 	if (pid == 0)
 	{
 		close(pfd[0]);
-		// to do: copy data from system V message queue to pipe
 
-		// if(write) // -1是因为主进程已终止，所以应该这里应该终止
+		// copy data from system V message queue to pipe
+		if ((msqid = msgget(IPC_PRIVATE, 0666)) == -1)
+			errExit("msgget");
+		printf("%d\n", msqid); // 为了让另一个能获取到对应的消息队列(写入一个文件来共享其实更好)
+
+		while (true)
+		{
+			if ((msglen = msgrcv(msqid, &msg, MAX_MTEXT, 0, 0)) == -1) // msglen是读入mtext字段的实际长度
+				errExit("msgrcv");
+
+			if (write(pfd[1], msg.mtext, msglen) != msglen)
+				errExit("write");
+		}
 		_exit(EXIT_SUCCESS);
 	}
 
@@ -51,7 +76,7 @@ int main()
 			if ((readn = read(STDIN_FILENO, buf, MAXLINE)) < 0)
 				errExit("read");
 			if (readn == 0)
-				break; // 子进程终止(这不是期待的结果)
+				break; // 子进程终止(这不是期待的结果，只有子进程错误终止才会这样)
 
 			if (write(STDOUT_FILENO, buf, readn) != readn)
 				errExit("write");
