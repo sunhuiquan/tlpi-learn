@@ -1509,12 +1509,16 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 ### NOTE_CH63
 
 1.我傻了，原来gdb不能SUID的(set-user-id)，这个是无用的
+2.vsc的debugger真弱鸡，printf能打印找错最好，实在不行就上gdb吧。
+3.read读终端是行缓冲的，意思是读到\n，read的返回值体现了这一点，确实是读入一行的读入长度；注意一下误区，那就是预读机制导致读到buf缓冲区的其实是能读多少读多少，这是为了效率，这个是对用户隐藏的，我们看到的应该是实际应该读入的，即read的返回值，对终端确实是行缓冲的。
 
 ### 63.1
 
 [代码](./Exercise/63/1/t_poll.c) 题干错了，应该是63-1的题，因为63-2程序本来就用的是poll
 
 ### 63.2
+
+to do: fix bugs
 
 [代码](./Exercise/63/2) 上道题用了poll，所以这次就用select玩玩。  
 本质就是一个采用I/O多路复用的并发服务器模型，我突然想起来当时CSAPP做了web proxy的那个lab就是这个思想，不过当时没有I/O多路复用的函数库，是手动实现的，挺有意思。  
@@ -1527,6 +1531,8 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 6.实现一个UDP的请求客户端，一个TCP的请求客户端，然后降低下BUF_SIZE让一次read不完，更好地体现通过I/O多路复用技术实现的并发服务。
 
 ### 63.3
+
+[代码](./Exercise/63/3) 有意思的是现在体现出来POSIX的好用之处了，因为linux和其他一些UNIX下，POSIX消息队列用的就是fd，可以被I/O多路复用函数监测，而system V的不可以。
 
 ### 63.4
 
