@@ -22,7 +22,8 @@
 					"ignoreFailures": true
 				}
 			],
-			"preLaunchTask": "C/C++: gcc-9",
+			"preLaunchTask": "C/C++: gcc-9", // 注意这个不是同一个bash进程，这是另一个进程，就是设置了进程属性也没用(gdb调试的进程是另外一个)
+			// "preLaunchTask": "see permit",
 			"miDebuggerPath": "/usr/bin/gdb"
 		}
 	]

@@ -1506,6 +1506,10 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ## CH63 其他备选的 I/O 模型
 
+### NOTE_CH63
+
+1.我傻了，原来gdb不能SUID的(set-user-id)，这个是无用的
+
 ### 63.1
 
 [代码](./Exercise/63/1/t_poll.c) 题干错了，应该是63-1的题，因为63-2程序本来就用的是poll
