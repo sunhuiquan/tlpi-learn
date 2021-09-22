@@ -6,6 +6,7 @@
 #include <tlpi_hdr.h>
 
 #define BUF_SIZE 1024 // 可以通过调小这个缓冲区来更好地体现I/O多路复用的并发性
+#define MAX_CONN_FD 1024
 
 int main()
 {
@@ -19,6 +20,10 @@ int main()
 
 	int readn;
 	char buf[BUF_SIZE];
+
+	int j;
+	int connfd;
+	int conn_fds[MAX_CONN_FD]; // 连接套接字的数据结构
 
 	// create a listening fd
 	if ((lfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -42,12 +47,15 @@ int main()
 	if (bind(dfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 		errExit("bind");
 
+	// initialize
+	for (int i = 0; i < MAX_CONN_FD; ++i)
+		conn_fds[i] = -1;
+
 	// add these socket fds into select's rfdset list
 	nfds = max(lfd, dfd) + 1;
 	FD_ZERO(&rfdset);
 	FD_SET(lfd, &rfdset);
 	FD_SET(dfd, &rfdset);
-
 	while (true)
 	{
 		nready = select(nfds, &rfdset, NULL, NULL, NULL);
@@ -57,7 +65,18 @@ int main()
 		// 为了防止因为循环读不停到来的数据导致其他fd饥饿，我们每次只做适量的I/O操作
 		if (FD_ISSET(lfd, &rfdset)) // can accept and create connected fd(s)
 		{
-			// to do
+			for (j = 0; j < MAX_CONN_FD; ++j)
+				if (conn_fds[j] == -1)
+					break;
+			if (j == MAX_CONN_FD)
+				continue;
+
+			if ((connfd = accept(lfd, NULL, NULL)) == -1)
+				errExit("accept");
+			if (connfd + 1 > nfds)
+				nfds = connfd + 1;
+			FD_SET(connfd, &rfdset);
+			conn_fds[j] = connfd;
 
 			--nready;
 			if (!nready)
@@ -67,13 +86,11 @@ int main()
 		if (FD_ISSET(dfd, &rfdset)) // can read the datagram fd
 		{
 			len = sizeof(from_addr);
-			// 数据报socket read返回0可能是对端发来了空消息
-			if ((readn = recvfrom(dfd, buf, BUF_SIZE, MSG_DONTWAIT,
-								  (struct sockaddr *)&from_addr, &len)) == -1)
+			// 数据报socket read返回0可能是发来了空数据报
+			if ((readn = recvfrom(dfd, buf, BUF_SIZE, MSG_DONTWAIT, (struct sockaddr *)&from_addr, &len)) == -1)
 				errExit("recvfrom");
 
-			if (sendto(dfd, buf, readn, MSG_DONTWAIT,
-					   (struct sockaddr *)&from_addr, len) != readn)
+			if (sendto(dfd, buf, readn, MSG_DONTWAIT, (struct sockaddr *)&from_addr, len) != readn)
 				errExit("sendto");
 
 			--nready;
@@ -81,7 +98,27 @@ int main()
 				continue;
 		}
 
-		// for (int i = 0;;++i) // the rest of tcp connected fds
+		for (int i = 0; i < MAX_CONN_FD; ++i) // the tcp connected fds
+		{
+			if (conn_fds[i] != -1 && FD_ISSET(conn_fds[i], &rfdset))
+			{
+				readn = read(conn_fds[i], buf, BUF_SIZE);
+				if (readn < 0)
+					errExit("read");
+				else if (readn == 0)
+				{
+					// client shutdown or close will send FIN, and server will get EOF
+					// 代表客户端(半)关闭，服务结束
+					FD_CLR(conn_fds[i], &rfdset);
+					close(conn_fds[i]);
+					conn_fds[i] = -1;
+					continue;
+				}
+
+				if (write(conn_fds[i], buf, readn) != readn)
+					errExit("write");
+			}
+		}
 	}
 
 	return 0;
