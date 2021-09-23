@@ -38,8 +38,8 @@ int main(int argc, char *argv[])
 	else
 		timeout = getInt(argv[1], 0, "timeout");
 
-	nfds = argc - 2 + 1; // add a pipe's read-end fd
-	ppfd = calloc(nfds, sizeof(struct pollfd));
+	nfds = argc - 2 + 1;						// add a pipe's read-end fd
+	ppfd = calloc(nfds, sizeof(struct pollfd)); // 如果是没用完位置的，要初始化-1，因为0也是fd
 	if (ppfd == NULL)
 		errExit("calloc");
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 	{
 		fd = getInt(argv[j], 0, "fd");
 		ppfd[index].fd = fd;
-		ppfd[index++].events = POLLIN;
+		ppfd[index].events = POLLIN;
 	}
 
 	if (pipe(pfd) == -1)
@@ -103,7 +103,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	// 一开始没初始化
 	printf("ready = %d\n", ready);
 	for (int i = 0; i < index; ++i)
 		printf("%d %s\n", ppfd[i].fd, (ppfd[i].revents & POLLIN) ? "r" : "-");

@@ -8,12 +8,13 @@
 			"name": "gcc-9",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/cl.out",
+			"program": "${fileDirname}/sp.out",
 			"args": [
-				"21"
+				"-",
+				"0"
 			],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/63/3", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/63/5", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",

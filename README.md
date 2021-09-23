@@ -1543,9 +1543,11 @@ system V这个消息队列发送mtype必须大于0，吐了。。。
 
 ### 63.5
 
-[代码](./Exercise/63/5/self_pipe.c)
+[代码](./Exercise/63/5/self_pipe.c) 要把用不到的pollfd的fd设为-1。
 
 ### 63.6
+
+[代码](./Exercise/63/6/demo.c)
 
 ### 63.7
 
