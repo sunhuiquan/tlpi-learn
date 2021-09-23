@@ -1,5 +1,5 @@
 #include <sys/time.h>
-#include <sys/select.h>
+#include <sys/poll.h>
 #include <fcntl.h>
 #include <signal.h>
 #include "tlpi_hdr.h"
@@ -19,54 +19,46 @@ handler(int sig)
 
 int main(int argc, char *argv[])
 {
-	fd_set readfds;
+	struct pollfd *ppfd;
 	int ready, nfds, flags;
-	struct timeval timeout;
-	struct timeval *pto;
+	int timeout;
 	struct sigaction sa;
 	char ch;
-	int fd, j;
+	int fd, index, j;
 
 	if (argc < 2 || strcmp(argv[1], "--help") == 0)
-		usageErr("%s {timeout|-} fd...\n"
+		usageErr("%s {timeout(ms)|-} fd...\n"
 				 "\t\t('-' means infinite timeout)\n",
 				 argv[0]);
 
 	/* Initialize 'timeout', 'readfds', and 'nfds' for select() */
 
 	if (strcmp(argv[1], "-") == 0)
-	{
-		pto = NULL; /* Infinite timeout */
-	}
+		timeout = -1; /* Infinite timeout */
 	else
-	{
-		pto = &timeout;
-		timeout.tv_sec = getLong(argv[1], 0, "timeout");
-		timeout.tv_usec = 0; /* No microseconds */
-	}
+		timeout = getInt(argv[1], 0, "timeout");
 
-	nfds = 0;
+	nfds = argc - 2 + 1; // add a pipe's read-end fd
+	ppfd = calloc(nfds, sizeof(struct pollfd));
+	if (ppfd == NULL)
+		errExit("calloc");
 
-	FD_ZERO(&readfds);
-	for (j = 2; j < argc; j++)
+	for (j = 2, index = 0; j < argc; ++j, ++index)
 	{
 		fd = getInt(argv[j], 0, "fd");
-		if (fd >= FD_SETSIZE)
-			cmdLineErr("file descriptor exceeds limit (%d)\n", FD_SETSIZE);
-
-		if (fd >= nfds)
-			nfds = fd + 1; /* Record maximum fd + 1 */
-		FD_SET(fd, &readfds);
+		ppfd[index].fd = fd;
+		ppfd[index++].events = POLLIN;
 	}
 
 	if (pipe(pfd) == -1)
 		errExit("pipe");
 
-	FD_SET(pfd[0], &readfds);	  /* Add read end of pipe to 'readfds' */
-	nfds = max(nfds, pfd[0] + 1); /* And adjust 'nfds' if required */
+	// 最后index是pfd[0]所在的ppfd的下标
+	ppfd[index].fd = pfd[0];
+	ppfd[index].events = POLLIN;
 
 	/* Make read and write ends of pipe nonblocking */
-
+	/* 因为这是一个self-pipe指代的是信号边缘触发的情况，所以要非阻塞 */
 	flags = fcntl(pfd[0], F_GETFL);
 	if (flags == -1)
 		errExit("fcntl-F_GETFL");
@@ -78,6 +70,7 @@ int main(int argc, char *argv[])
 	if (flags == -1)
 		errExit("fcntl-F_GETFL");
 	flags |= O_NONBLOCK; /* Make write end nonblocking */
+	// 对应太多信号到来导致pipe缓冲区溢出，避免这种情况阻塞,该程序这种情况会死锁
 	if (fcntl(pfd[1], F_SETFL, flags) == -1)
 		errExit("fcntl-F_SETFL");
 
@@ -87,13 +80,12 @@ int main(int argc, char *argv[])
 	if (sigaction(SIGINT, &sa, NULL) == -1)
 		errExit("sigaction");
 
-	while ((ready = select(nfds, &readfds, NULL, NULL, pto)) == -1 &&
-		   errno == EINTR)
-		continue;	 /* Restart if interrupted by signal */
+	while ((ready = poll(ppfd, nfds, timeout)) == -1 && errno == EINTR)
+		continue;
 	if (ready == -1) /* Unexpected error */
 		errExit("select");
 
-	if (FD_ISSET(pfd[0], &readfds))
+	if (ppfd[index].revents & POLLIN)
 	{ /* Handler was called */
 		printf("A signal was caught\n");
 
@@ -111,21 +103,17 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	printf("ready = %d\n", ready);
-	for (j = 2; j < argc; j++)
-	{
-		fd = getInt(argv[j], 0, "fd");
-		printf("%d: %s\n", fd, FD_ISSET(fd, &readfds) ? "r" : "");
-	}
+	// printf("ready = %d\n", ready);
+	// for (j = 2; j < argc; j++)
+	// {
+	// 	fd = getInt(argv[j], 0, "fd");
+	// 	printf("%d: %s\n", fd, FD_ISSET(fd, &readfds) ? "r" : "");
+	// }
 
 	/* And check if read end of pipe is ready */
 
-	printf("%d: %s   (read end of pipe)\n", pfd[0],
-		   FD_ISSET(pfd[0], &readfds) ? "r" : "");
-
-	if (pto != NULL)
-		printf("timeout after select(): %ld.%03ld\n",
-			   (long)timeout.tv_sec, (long)timeout.tv_usec / 1000);
+	// printf("%d: %s   (read end of pipe)\n", pfd[0],
+	// 	   FD_ISSET(pfd[0], &readfds) ? "r" : "");
 
 	exit(EXIT_SUCCESS);
 }
