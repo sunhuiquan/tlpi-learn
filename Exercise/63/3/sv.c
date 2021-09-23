@@ -71,7 +71,7 @@ int main()
 
 			alarm(0); // 避免打断后面的调用
 
-			// to do 检测pipe对端是否关闭
+			// 检测pipe对端是否关闭
 			if (is_pipe_closed(pfd[1]))
 			{
 				if (msgctl(msqid, IPC_RMID, NULL) == -1)
@@ -87,12 +87,13 @@ int main()
 
 	close(pfd[1]);
 	FD_ZERO(&rfdset);
-	FD_SET(STDIN_FILENO, &rfdset);
-	FD_SET(pfd[0], &rfdset);
 	maxfd = max(pfd[0], STDIN_FILENO) + 1;
 
 	while (true)
 	{
+		// 千万别忘了select会清除这次没就绪的
+		FD_SET(STDIN_FILENO, &rfdset);
+		FD_SET(pfd[0], &rfdset);
 		if (select(maxfd, &rfdset, NULL, NULL, NULL) == -1)
 			errExit("select");
 
@@ -109,12 +110,15 @@ int main()
 
 		if (FD_ISSET(pfd[0], &rfdset))
 		{
-			if ((readn = read(STDIN_FILENO, buf, MAXLINE)) < 0)
+			if ((readn = read(pfd[0], buf, MAXLINE)) < 0)
 				errExit("read");
 			if (readn == 0)
 				break; // 子进程终止(这不是期待的结果，只有子进程错误终止才会这样)
 
-			if (write(STDOUT_FILENO, buf, readn) != readn)
+			if (readn >= MAX_MTEXT)
+				errExit("overflow");
+			buf[readn] = '\n';
+			if (write(STDOUT_FILENO, buf, readn + 1) != readn + 1)
 				errExit("write");
 		}
 	}

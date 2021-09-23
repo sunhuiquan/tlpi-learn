@@ -22,10 +22,10 @@ int main(int argc, char *argv[])
 	}
 
 	msqid = atoi(argv[1]);
-	msg.mtype = 0;
+	msg.mtype = 1; // system V这个消息队列发送mtype必须大于0
 	len = strlen("from message queue");
-	strncpy(msg.mtext, "from message queue", len);
-	for (int i = 0; i < 30; ++i)
+	strncpy(msg.mtext, "from message queue", MAX_MTEXT);
+	for (int i = 0; i < 5; ++i)
 	{
 		if (msgsnd(msqid, &msg, len, 0) == -1) // 这个函数确保一旦发送成功一定发送全部数据
 			errExit("msgsnd");

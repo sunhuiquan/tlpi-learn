@@ -1533,7 +1533,9 @@ to do: fix bugs
 ### 63.3
 
 [代码](./Exercise/63/3) 有意思的是现在体现出来POSIX的好用之处了，因为linux和其他一些UNIX下，POSIX消息队列用的就是fd，可以被I/O多路复用函数监测，而system V的不可以。  
-学到了个阴间技巧，通过poll检测pipe对面的读端是否关闭(对端已关闭写端，本地已关闭读端)，而不用写任何数据，注意不能write 0，这个只会返回0，poll用POLLOUT当写不阻塞为就绪，然后如果返回-1那么POLLERR设置，只需要让pfd.revents & POLLERR可知是错误还是正常写，检测而不用写入任何实际内容。
+学到了个阴间技巧，通过poll检测pipe对面的读端是否关闭(对端已关闭写端，本地已关闭读端)，而不用写任何数据，注意不能write 0，这个只会返回0，poll用POLLOUT当写不阻塞为就绪，然后如果返回-1那么POLLERR设置，只需要让pfd.revents & POLLERR可知是错误还是正常写，检测而不用写入任何实际内容。  
+system V这个消息队列发送mtype必须大于0，吐了。。。  
+我真是弱智，忘了select会清除那些这次没就绪的，没在循环里重新FD_SET()。
 
 ### 63.4
 

@@ -8,10 +8,12 @@
 			"name": "gcc-9",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/echo_sv.out",
-			"args": [],
+			"program": "${fileDirname}/cl.out",
+			"args": [
+				"21"
+			],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/63/2", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/63/3", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",
@@ -22,7 +24,7 @@
 					"ignoreFailures": true
 				}
 			],
-			"preLaunchTask": "C/C++: gcc-9", // 注意这个不是同一个bash进程，这是另一个进程，就是设置了进程属性也没用(gdb调试的进程是另外一个)
+			// "preLaunchTask": "C/C++: gcc-9", // 注意这个不是同一个bash进程，这是另一个进程，就是设置了进程属性也没用(gdb调试的进程是另外一个)
 			// "preLaunchTask": "see permit",
 			"miDebuggerPath": "/usr/bin/gdb"
 		}
