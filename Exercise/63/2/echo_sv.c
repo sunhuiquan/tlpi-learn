@@ -54,10 +54,14 @@ int main()
 	// add these socket fds into select's rfdset list
 	nfds = max(lfd, dfd) + 1;
 	FD_ZERO(&rfdset);
-	FD_SET(lfd, &rfdset);
-	FD_SET(dfd, &rfdset);
 	while (true)
 	{
+		FD_SET(lfd, &rfdset);
+		FD_SET(dfd, &rfdset);
+		for (int i = 0; i < MAX_CONN_FD; ++i)
+			if (conn_fds[i] != -1)
+				FD_SET(conn_fds[i], &rfdset);
+
 		nready = select(nfds, &rfdset, NULL, NULL, NULL);
 		if (nready == -1)
 			errExit("select");
@@ -75,7 +79,6 @@ int main()
 				errExit("accept");
 			if (connfd + 1 > nfds)
 				nfds = connfd + 1;
-			FD_SET(connfd, &rfdset);
 			conn_fds[j] = connfd;
 
 			--nready;

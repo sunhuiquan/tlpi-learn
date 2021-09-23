@@ -1518,9 +1518,7 @@ NOTE: conf 没有服务启用的情况下 sudo /etc/init.d/openbsd-inetd start �
 
 ### 63.2
 
-to do: fix bugs
-
-[代码实现](./Exercise/63/2) 上道题用了poll，所以这次就用select玩玩。  
+[代码实现](./Exercise/63/2) 上道题用了poll，所以这次就用select玩玩(别忘了循环select的话要不停地重新FD_SET()，这个最容易出bug)。  
 本质就是一个采用I/O多路复用的并发服务器模型，我突然想起来当时CSAPP做了web proxy的那个lab就是这个思想，不过当时没有I/O多路复用的函数库，是手动实现的，挺有意思。  
 比较有意思的点：  
 1.服务器同时开一个监听流式套接字和一个绑定到同一个端口号的两个端口(虽然同一个值，但是一个是TCP的端口，一个是UDP的端口，是两个完全没关系的端口，当然可以分别bind)的数据报套接字。  

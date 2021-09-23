@@ -31,6 +31,7 @@ int main()
 			errExit("recv");
 		if (write(STDOUT_FILENO, buf, readn) != readn)
 			errExit("write");
+		sleep(1);
 	}
 
 	return 0;
