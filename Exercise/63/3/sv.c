@@ -2,6 +2,7 @@
 #include <sys/msg.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <sys/poll.h>
 #include <tlpi_hdr.h>
 
 #define MAXLINE 1024
@@ -16,6 +17,18 @@ struct mbuf
 void sigalarm_handler(int sig)
 {
 	return; // do nothing, just interupt a system call
+}
+
+int is_pipe_closed(int fd)
+{
+	struct pollfd pfd = {
+		.fd = fd,
+		.events = POLLOUT,
+	};
+
+	if (poll(&pfd, 1, 1) < 0)
+		return 0;
+	return (pfd.revents & POLLERR) ? 1 : 0;
 }
 
 int main()
@@ -36,7 +49,6 @@ int main()
 
 	if (pid == 0)
 	{
-		printf("a1\n");
 		close(pfd[0]);
 
 		// copy data from system V message queue to pipe
@@ -44,9 +56,11 @@ int main()
 			errExit("msgget");
 		printf("msqid: %d\n", msqid); // 为了让另一个能获取到对应的消息队列(写入一个文件来共享其实更好)
 
-		// to do
-		// if (sigaction(SIGALRM, &act, NULL) == -1)
-		// 	errExit("sigaction");
+		sigemptyset(&act.sa_mask);
+		act.sa_handler = sigalarm_handler;
+		act.sa_flags = 0;
+		if (sigaction(SIGALRM, &act, NULL) == -1)
+			errExit("sigaction");
 
 		while (true)
 		{
@@ -55,14 +69,20 @@ int main()
 			if ((msglen = msgrcv(msqid, &msg, MAX_MTEXT, 0, 0)) == -1 && errno != EINTR) // msglen是读入mtext字段的实际长度
 				errExit("msgrcv");
 
-			alarm(0);										// 避免打断write调用
-			if (write(pfd[1], msg.mtext, msglen) != msglen) // 如果主进程关闭，那么write会返回-1，会终止子进程
+			alarm(0); // 避免打断后面的调用
+
+			// to do 检测pipe对端是否关闭
+			if (is_pipe_closed(pfd[1]))
+			{
+				if (msgctl(msqid, IPC_RMID, NULL) == -1)
+					errExit("msgctl");
+				_exit(EXIT_SUCCESS);
+			}
+
+			if (msglen != -1 && write(pfd[1], msg.mtext, msglen) != msglen)
 				errExit("write");
 		}
-		printf("a3\n");
-		if (msgctl(msqid, IPC_RMID, NULL) == -1)
-			errExit("msgctl");
-		_exit(EXIT_SUCCESS);
+		_exit(EXIT_SUCCESS); // never end here
 	}
 
 	close(pfd[1]);
