@@ -1,6 +1,7 @@
 #include <sys/select.h>
 #include <sys/msg.h>
 #include <sys/stat.h>
+#include <signal.h>
 #include <tlpi_hdr.h>
 
 #define MAXLINE 1024
@@ -12,6 +13,11 @@ struct mbuf
 	char mtext[MAX_MTEXT];
 };
 
+void sigalarm_handler(int sig)
+{
+	return; // do nothing, just interupt a system call
+}
+
 int main()
 {
 	int pid, maxfd, readn, msglen;
@@ -21,6 +27,7 @@ int main()
 
 	int msqid; // 这个不是fd注意
 	struct mbuf msg;
+	struct sigaction act;
 
 	if (pipe(pfd) == -1)
 		errExit("pipe");
@@ -29,21 +36,32 @@ int main()
 
 	if (pid == 0)
 	{
+		printf("a1\n");
 		close(pfd[0]);
 
 		// copy data from system V message queue to pipe
 		if ((msqid = msgget(IPC_PRIVATE, 0666)) == -1)
 			errExit("msgget");
-		printf("%d\n", msqid); // 为了让另一个能获取到对应的消息队列(写入一个文件来共享其实更好)
+		printf("msqid: %d\n", msqid); // 为了让另一个能获取到对应的消息队列(写入一个文件来共享其实更好)
+
+		// to do
+		// if (sigaction(SIGALRM, &act, NULL) == -1)
+		// 	errExit("sigaction");
 
 		while (true)
 		{
-			if ((msglen = msgrcv(msqid, &msg, MAX_MTEXT, 0, 0)) == -1) // msglen是读入mtext字段的实际长度
+			alarm(3); // 这个技术主要是为了方式阻塞在msgrcv导致无法发现主进程已关闭
+			// 但是由于system V不可以被IO多路复用检测，所以可以通过父进程发一个信号也行，不过这次我用这个定时的方式
+			if ((msglen = msgrcv(msqid, &msg, MAX_MTEXT, 0, 0)) == -1 && errno != EINTR) // msglen是读入mtext字段的实际长度
 				errExit("msgrcv");
 
-			if (write(pfd[1], msg.mtext, msglen) != msglen)
+			alarm(0);										// 避免打断write调用
+			if (write(pfd[1], msg.mtext, msglen) != msglen) // 如果主进程关闭，那么write会返回-1，会终止子进程
 				errExit("write");
 		}
+		printf("a3\n");
+		if (msgctl(msqid, IPC_RMID, NULL) == -1)
+			errExit("msgctl");
 		_exit(EXIT_SUCCESS);
 	}
 
