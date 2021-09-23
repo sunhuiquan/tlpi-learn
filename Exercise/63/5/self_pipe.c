@@ -103,17 +103,13 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	// printf("ready = %d\n", ready);
-	// for (j = 2; j < argc; j++)
-	// {
-	// 	fd = getInt(argv[j], 0, "fd");
-	// 	printf("%d: %s\n", fd, FD_ISSET(fd, &readfds) ? "r" : "");
-	// }
+	// 一开始没初始化
+	printf("ready = %d\n", ready);
+	for (int i = 0; i < index; ++i)
+		printf("%d %s\n", ppfd[i].fd, (ppfd[i].revents & POLLIN) ? "r" : "-");
 
-	/* And check if read end of pipe is ready */
-
-	// printf("%d: %s   (read end of pipe)\n", pfd[0],
-	// 	   FD_ISSET(pfd[0], &readfds) ? "r" : "");
+	printf("%d: %s   (read end of pipe)\n", ppfd[index].fd,
+		   (ppfd[index].revents & POLLIN) ? "r" : "-");
 
 	exit(EXIT_SUCCESS);
 }
