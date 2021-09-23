@@ -1,7 +1,10 @@
+#define _GNU_SOURCE
+
 #include <signal.h>
 #include <ctype.h>
-#include <fcntl.h>
 #include <termios.h>
+#include <signal.h>
+#include <fcntl.h>
 #include <tlpi_hdr.h>
 #include "../../../tlpi-dist/tty/tty_functions.h" /* Declaration of ttySetCbreak() */
 
@@ -9,8 +12,12 @@ static volatile sig_atomic_t gotSigio = 0;
 /* Set nonzero on receipt of SIGIO */
 
 static void
-sigioHandler(int sig)
+sigrtminHandler(int sig, siginfo_t *si, void *context)
 {
+	// unsafe here
+	printf("signo: %d, si_fd: %d, si_code: %s\n", si->si_signo, si->si_fd,
+		   (si->si_code == SI_USER) ? "SI_USER" : (si->si_code == SI_QUEUE) ? "SI_QUEUE"
+																			: "other");
 	gotSigio = 1;
 }
 
@@ -25,9 +32,9 @@ int main(int argc, char *argv[])
 	/* Establish handler for "I/O possible" signal */
 
 	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = SA_RESTART;
-	sa.sa_handler = sigioHandler;
-	if (sigaction(SIGIO, &sa, NULL) == -1)
+	sa.sa_flags = SA_RESTART | SA_SIGINFO;
+	sa.sa_sigaction = sigrtminHandler;
+	if (sigaction(SIGRTMIN, &sa, NULL) == -1)
 		errExit("sigaction");
 
 	/* Set owner process that is to receive "I/O possible" signal */
@@ -37,6 +44,8 @@ int main(int argc, char *argv[])
 
 	/* Enable "I/O possible" signaling and make I/O nonblocking
        for file descriptor */
+	if (fcntl(STDIN_FILENO, F_SETSIG, SIGRTMIN) == -1)
+		errExit("fcntl(F_SETSIG)");
 
 	flags = fcntl(STDIN_FILENO, F_GETFL);
 	if (fcntl(STDIN_FILENO, F_SETFL, flags | O_ASYNC | O_NONBLOCK) == -1)

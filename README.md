@@ -1555,7 +1555,7 @@ system V这个消息队列发送mtype必须大于0，吐了。。。
 
 ### 63.8
 
-[代码实现](./Exercise/63/8/demo_sigio.c)
+[代码实现](./Exercise/63/8/demo_sigio.c) 注意一下，终端属性是一个进程属性，_GNU_SOURCE特性测试宏加了才能用F_SETSIG。
 
 ---
 
