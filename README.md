@@ -1543,15 +1543,17 @@ system V这个消息队列发送mtype必须大于0，吐了。。。
 
 ### 63.5
 
-[代码](./Exercise/63/5/self_pipe.c) 要把用不到的pollfd的fd设为-1。
+[代码](./Exercise/63/5/self_pipe.c) 要把用不到的pollfd的fd设为-1(虽然这个程序没体现)，另外calloc初始化为0，避免忘记初始化event导致错误。
 
 ### 63.6
 
-[代码](./Exercise/63/6/demo.c)
+这样的兴趣列表为空的epoll实例上调用epoll_wait()也会阻塞，这种是有用的，在多线程程序中，别的线程可以给阻塞的这个epoll实例添加兴趣列表，这样动态地增删兴趣列表是非常有用的。
 
 ### 63.7
 
 ### 63.8
+
+[代码](./Exercise/63/8/demo_sigio.c)
 
 ---
 

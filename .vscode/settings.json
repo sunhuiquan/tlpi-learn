@@ -58,7 +58,8 @@
 		"ind.h": "c",
 		"shell_h.h": "c",
 		"inet.h": "c",
-		"poll.h": "c"
+		"poll.h": "c",
+		"termios.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
