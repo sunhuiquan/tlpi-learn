@@ -37,6 +37,7 @@ void sigwinch_handler(int sig)
 void sigchld_hander(int sig)
 {
 	// 子进程关闭，通知父进程也该关了
+	// printf("parent exit\n"); // unsafe only ues it for testing
 	exit(EXIT_SUCCESS);
 }
 
@@ -142,9 +143,10 @@ int main(int argc, char *argv[])
 					errExit("time");
 				pctime = ctime(&curr_time);
 				snprintf(time_str, MAXTIMELEN, "Script ended on %s\n", (pctime == NULL) ? "can't get time" : pctime);
-				printf("%s\n", time_str);
+				printf("%s", time_str);
 				if (write(scriptFd, time_str, strlen(time_str)) != strlen(time_str))
 					fatal("partial/failed write (scriptFd)");
+				// printf("child exit\n");
 				_exit(EXIT_SUCCESS);
 			}
 
@@ -158,6 +160,14 @@ int main(int argc, char *argv[])
 
 	default:
 		// parent: this process is for STDIN_FILENO
+		sigemptyset(&act.sa_mask);
+		act.sa_flags = 0;
+		act.sa_handler = sigchld_hander;
+		if (sigaction(SIGCHLD, &act, NULL) == -1)
+			errExit("sigaction");
+
+		// 不用担心子shell在sigaction前终止，因为向主设备写的操作是在sigaction之后的，所以安全
+		// (详细过程:从终端向主设备写，之后主设备到从设备，子shell再从从设备读)
 		for (;;)
 		{
 			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
