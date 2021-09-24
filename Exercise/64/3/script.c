@@ -34,6 +34,12 @@ void sigwinch_handler(int sig)
 	errno = saved_errno;
 }
 
+void sigchld_hander(int sig)
+{
+	// 子进程关闭，通知父进程也该关了
+	exit(EXIT_SUCCESS);
+}
+
 static void /* Reset terminal mode on program exit */
 ttyReset(void)
 {
@@ -135,11 +141,11 @@ int main(int argc, char *argv[])
 				if (time(&curr_time) == -1)
 					errExit("time");
 				pctime = ctime(&curr_time);
-				snprintf(time_str, MAXTIMELEN, "Script started on %s\n", (pctime == NULL) ? "can't get time" : pctime);
+				snprintf(time_str, MAXTIMELEN, "Script ended on %s\n", (pctime == NULL) ? "can't get time" : pctime);
 				printf("%s\n", time_str);
 				if (write(scriptFd, time_str, strlen(time_str)) != strlen(time_str))
 					fatal("partial/failed write (scriptFd)");
-				exit(EXIT_SUCCESS);
+				_exit(EXIT_SUCCESS);
 			}
 
 			if (write(STDOUT_FILENO, buf, numRead) != numRead)
@@ -154,10 +160,9 @@ int main(int argc, char *argv[])
 		// parent: this process is for STDIN_FILENO
 		for (;;)
 		{
-			close(masterFd);
 			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
-			if (numRead <= 0) // 正常退出^D也是通过这个途径
-				exit(EXIT_SUCCESS);
+			if (numRead <= 0)
+				errExit("read");
 
 			if (write(masterFd, buf, numRead) != numRead)
 				fatal("partial/failed write (masterFd)");
