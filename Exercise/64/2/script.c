@@ -110,10 +110,12 @@ int main(int argc, char *argv[])
 		FD_SET(masterFd, &inFds);
 
 		if (select(masterFd + 1, &inFds, NULL, NULL, NULL) == -1)
+		{
 			if (errno = EINTR)
 				continue;
 			else
 				errExit("select");
+		}
 
 		if (FD_ISSET(STDIN_FILENO, &inFds))
 		{ /* stdin --> pty */
@@ -124,7 +126,6 @@ int main(int argc, char *argv[])
 			if (write(masterFd, buf, numRead) != numRead)
 				fatal("partial/failed write (masterFd)");
 		}
-
 		if (FD_ISSET(masterFd, &inFds))
 		{ /* pty --> stdout+file */
 			numRead = read(masterFd, buf, BUF_SIZE);
