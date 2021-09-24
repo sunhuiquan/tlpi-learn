@@ -5,6 +5,7 @@
 #include <sys/select.h>
 #include <tlpi_hdr.h>
 #include <time.h>
+#include <signal.h>
 #include "../../../tlpi-dist/pty/pty_fork.h"	  /* Declaration of ptyFork() */
 #include "../../../tlpi-dist/tty/tty_functions.h" /* Declaration of ttySetRaw() */
 
@@ -13,6 +14,11 @@
 #define MAXTIMELEN 128
 
 struct termios ttyOrig;
+
+void sigwinch_handler(int sig)
+{
+	printf("window size changed\n"); // unsafe
+}
 
 static void /* Reset terminal mode on program exit */
 ttyReset(void)
@@ -34,6 +40,7 @@ int main(int argc, char *argv[])
 	time_t curr_time;
 	char *pctime;
 	char time_str[MAXTIMELEN];
+	struct sigaction act;
 
 	/* Retrieve the attributes of terminal on which we are started */
 
@@ -70,6 +77,12 @@ int main(int argc, char *argv[])
 
 	/* Parent: relay data between terminal and pty master */
 
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = SA_RESTART;
+	act.sa_handler = sigwinch_handler;
+	if (sigaction(SIGWINCH, &act, NULL) == -1)
+		errExit("sigaction");
+
 	scriptFd = open((argc > 1) ? argv[1] : "typescript",
 					O_WRONLY | O_CREAT | O_TRUNC,
 					S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
@@ -97,7 +110,10 @@ int main(int argc, char *argv[])
 		FD_SET(masterFd, &inFds);
 
 		if (select(masterFd + 1, &inFds, NULL, NULL, NULL) == -1)
-			errExit("select");
+			if (errno = EINTR)
+				continue;
+			else
+				errExit("select");
 
 		if (FD_ISSET(STDIN_FILENO, &inFds))
 		{ /* stdin --> pty */

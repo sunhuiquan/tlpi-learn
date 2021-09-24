@@ -1567,7 +1567,8 @@ system V 这个消息队列发送 mtype 必须大于 0，吐了。。。
 
 ### 64.2
 
-[代码实现](./Exercise/64/2/script.c)
+[代码实现](./Exercise/64/2/script.c) 很有趣的，设置了 SIGWINCH 信号后，终端大小改变(用鼠标拉大拉小这样)，就会发出一个 SIGWINCH 信号。  
+注意要设置 SA_RESTART，但对于低速系统调用无法 SA_RESTART 自动重启，要处理 EINTR 的错误。
 
 ### 64.3
 
