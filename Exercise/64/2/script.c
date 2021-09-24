@@ -10,6 +10,7 @@
 
 #define BUF_SIZE 256
 #define MAX_SNAME 1000
+#define MAXTIMELEN 128
 
 struct termios ttyOrig;
 
@@ -30,7 +31,9 @@ int main(int argc, char *argv[])
 	char buf[BUF_SIZE];
 	ssize_t numRead;
 	pid_t childPid;
-	time_t start_time, end_time;
+	time_t curr_time;
+	char *pctime;
+	char time_str[MAXTIMELEN];
 
 	/* Retrieve the attributes of terminal on which we are started */
 
@@ -49,7 +52,10 @@ int main(int argc, char *argv[])
 
 	if (childPid == 0)
 	{ /* Child: execute a shell on pty slave */
-		// if(time())
+		if (time(&curr_time) == -1)
+			errExit("time");
+		pctime = ctime(&curr_time);
+		printf("Script started on %s\n", (pctime == NULL) ? "can't get time" : pctime);
 
 		/* If the SHELL variable is set, use its value to determine
            the shell execed in child. Otherwise use /bin/sh. */
@@ -96,7 +102,7 @@ int main(int argc, char *argv[])
 		if (FD_ISSET(STDIN_FILENO, &inFds))
 		{ /* stdin --> pty */
 			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
-			if (numRead <= 0)
+			if (numRead <= 0) // 正常退出^D也是通过这个途径
 				exit(EXIT_SUCCESS);
 
 			if (write(masterFd, buf, numRead) != numRead)
@@ -106,8 +112,17 @@ int main(int argc, char *argv[])
 		if (FD_ISSET(masterFd, &inFds))
 		{ /* pty --> stdout+file */
 			numRead = read(masterFd, buf, BUF_SIZE);
-			if (numRead <= 0)
+			if (numRead <= 0) // 正常退出也是通过这个途径
+			{
+				if (time(&curr_time) == -1)
+					errExit("time");
+				pctime = ctime(&curr_time);
+				snprintf(time_str, MAXTIMELEN, "Script started on %s\n", (pctime == NULL) ? "can't get time" : pctime);
+				printf("%s\n", time_str);
+				if (write(scriptFd, time_str, strlen(time_str)) != strlen(time_str))
+					fatal("partial/failed write (scriptFd)");
 				exit(EXIT_SUCCESS);
+			}
 
 			if (write(STDOUT_FILENO, buf, numRead) != numRead)
 				fatal("partial/failed write (STDOUT_FILENO)");

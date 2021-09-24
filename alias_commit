@@ -1,1 +1,1 @@
-alias cmt='git add /home/water/work/tlpi-learn/;git commit -m "add"'
+alias cmt='git add /home/water/work/TLPI_learn_note/;git commit -m "add"'
