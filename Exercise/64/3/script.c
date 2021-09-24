@@ -47,7 +47,6 @@ int main(int argc, char *argv[])
 	char *shell;
 	int scriptFd;
 	struct winsize ws;
-	fd_set inFds;
 	char buf[BUF_SIZE];
 	ssize_t numRead;
 	pid_t childPid;
@@ -55,6 +54,7 @@ int main(int argc, char *argv[])
 	char *pctime;
 	char time_str[MAXTIMELEN];
 	struct sigaction act;
+	pid_t pid;
 
 	/* Retrieve the attributes of terminal on which we are started */
 
@@ -117,31 +117,18 @@ int main(int argc, char *argv[])
        them to the pty master. If the pty master is ready for input,
        then read some bytes and write them to the terminal. */
 
-	for (;;)
+	pid = fork();
+	switch (pid)
 	{
-		FD_ZERO(&inFds);
-		FD_SET(STDIN_FILENO, &inFds);
-		FD_SET(masterFd, &inFds);
+	case -1:
+		errExit("fork");
+		break;
 
-		if (select(masterFd + 1, &inFds, NULL, NULL, NULL) == -1)
+	// 一定要用阻塞，避免在无限循环里面疯狂自旋，浪费CPU
+	case 0:
+		// childL: this process is for masterFD
+		for (;;)
 		{
-			if (errno = EINTR)
-				continue;
-			else
-				errExit("select");
-		}
-
-		if (FD_ISSET(STDIN_FILENO, &inFds))
-		{ /* stdin --> pty */
-			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
-			if (numRead <= 0) // 正常退出^D也是通过这个途径
-				exit(EXIT_SUCCESS);
-
-			if (write(masterFd, buf, numRead) != numRead)
-				fatal("partial/failed write (masterFd)");
-		}
-		if (FD_ISSET(masterFd, &inFds))
-		{ /* pty --> stdout+file */
 			numRead = read(masterFd, buf, BUF_SIZE);
 			if (numRead <= 0) // 正常退出也是通过这个途径
 			{
@@ -160,5 +147,22 @@ int main(int argc, char *argv[])
 			if (write(scriptFd, buf, numRead) != numRead)
 				fatal("partial/failed write (scriptFd)");
 		}
+		_exit(EXIT_SUCCESS);
+		break;
+
+	default:
+		// parent: this process is for STDIN_FILENO
+		for (;;)
+		{
+			close(masterFd);
+			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
+			if (numRead <= 0) // 正常退出^D也是通过这个途径
+				exit(EXIT_SUCCESS);
+
+			if (write(masterFd, buf, numRead) != numRead)
+				fatal("partial/failed write (masterFd)");
+		}
+		break;
 	}
+	exit(EXIT_SUCCESS);
 }
