@@ -2,6 +2,7 @@
 #include <fcntl.h>
 #include <libgen.h>
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <sys/select.h>
 #include <tlpi_hdr.h>
 #include <time.h>
@@ -14,10 +15,19 @@
 #define MAXTIMELEN 128
 
 struct termios ttyOrig;
+int masterFd;
 
 void sigwinch_handler(int sig)
 {
-	printf("window size changed\n"); // unsafe
+	int saved_errno = errno;
+
+	struct winsize ws;
+	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)
+		errExit("ioctl");
+	if (ioctl(masterFd, TIOCSWINSZ, &ws) == -1)
+		errExit("ioctl");
+
+	errno = saved_errno;
 }
 
 static void /* Reset terminal mode on program exit */
@@ -31,7 +41,7 @@ int main(int argc, char *argv[])
 {
 	char slaveName[MAX_SNAME];
 	char *shell;
-	int masterFd, scriptFd;
+	int scriptFd;
 	struct winsize ws;
 	fd_set inFds;
 	char buf[BUF_SIZE];
