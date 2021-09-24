@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <sys/select.h>
 #include <tlpi_hdr.h>
+#include <time.h>
 #include "../../../tlpi-dist/pty/pty_fork.h"	  /* Declaration of ptyFork() */
 #include "../../../tlpi-dist/tty/tty_functions.h" /* Declaration of ttySetRaw() */
 
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
 	char buf[BUF_SIZE];
 	ssize_t numRead;
 	pid_t childPid;
+	time_t start_time, end_time;
 
 	/* Retrieve the attributes of terminal on which we are started */
 
@@ -47,6 +49,7 @@ int main(int argc, char *argv[])
 
 	if (childPid == 0)
 	{ /* Child: execute a shell on pty slave */
+		// if(time())
 
 		/* If the SHELL variable is set, use its value to determine
            the shell execed in child. Otherwise use /bin/sh. */

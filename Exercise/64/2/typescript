@@ -1,9 +1,9 @@
-]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ ls
+Script started on 2021-09-24 13:39:33+08:00 [TERM="xterm-256color" TTY="/dev/pts/0" COLUMNS="137" LINES="20"]
+]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ aa[K[Kls
 script.c  [0m[01;32mscript.out[0m  typescript
 ]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ more typescript 
-]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ ls
-script.c  [0m[01;32mscript.out[0m  typescript
-]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ mor
-e typescript 
+]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ echo aaa
+aaa
 ]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ exit
-exit
+
+Script done on 2021-09-24 13:39:52+08:00 [COMMAND_EXIT_CODE="0"]
