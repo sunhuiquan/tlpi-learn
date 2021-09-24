@@ -22,10 +22,14 @@ void sigwinch_handler(int sig)
 	int saved_errno = errno;
 
 	struct winsize ws;
-	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)
-		errExit("ioctl");
-	if (ioctl(masterFd, TIOCSWINSZ, &ws) == -1)
-		errExit("ioctl");
+	// if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)
+	// 	errExit("ioctl");
+	// if (ioctl(masterFd, TIOCSWINSZ, &ws) == -1)
+	// 	errExit("ioctl");
+
+	// 因为终端大小设置失败也不致命，只要保护好errno值就行
+	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1)
+		ioctl(masterFd, TIOCSWINSZ, &ws);
 
 	errno = saved_errno;
 }
