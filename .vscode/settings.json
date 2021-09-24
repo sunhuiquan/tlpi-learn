@@ -59,7 +59,9 @@
 		"shell_h.h": "c",
 		"inet.h": "c",
 		"poll.h": "c",
-		"termios.h": "c"
+		"termios.h": "c",
+		"select.h": "c",
+		"pty_fork.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }

@@ -1,0 +1,9 @@
+]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ ls
+script.c  [0m[01;32mscript.out[0m  typescript
+]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ more typescript 
+]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ ls
+script.c  [0m[01;32mscript.out[0m  typescript
+]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ mor
+e typescript 
+]0;water@water: ~/work/tlpi-learn/Exercise/64/2[01;32mwater@water[00m:[01;34m~/work/tlpi-learn/Exercise/64/2[00m$ exit
+exit
