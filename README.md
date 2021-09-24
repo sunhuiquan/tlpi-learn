@@ -66,7 +66,6 @@ My notes and solutions for The Linux Programing Interface (TLPI)
 - [CH62 终端](#CH62-终端)
 - [CH63 其他备选的 I/O 模型](#CH63-其他备选的-io-模型)
 - [CH64 伪终端](#CH64-伪终端)
-- [附录](#附录)
 
 ## 环境搭建
 
@@ -1577,11 +1576,5 @@ system V这个消息队列发送mtype必须大于0，吐了。。。
 ### 64.7
 
 ### 64.8
-
----
-
-## 附录
-
-### A
 
 ---
