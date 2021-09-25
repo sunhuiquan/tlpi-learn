@@ -6,6 +6,7 @@
 #include <sys/select.h>
 #include <tlpi_hdr.h>
 #include <time.h>
+#include <sys/time.h>
 #include <signal.h>
 #include "../../../tlpi-dist/pty/pty_fork.h"	  /* Declaration of ptyFork() */
 #include "../../../tlpi-dist/tty/tty_functions.h" /* Declaration of ttySetRaw() */
@@ -16,6 +17,8 @@
 
 struct termios ttyOrig;
 int masterFd;
+
+int passtime(const struct timeval *start);
 
 void sigwinch_handler(int sig)
 {
@@ -45,16 +48,21 @@ int main(int argc, char *argv[])
 {
 	char slaveName[MAX_SNAME];
 	char *shell;
-	int scriptFd;
+	int scriptFd, replayFd;
 	struct winsize ws;
 	fd_set inFds;
 	char buf[BUF_SIZE];
+	char buf2[BUF_SIZE + 20];
+	char command[BUF_SIZE];
 	ssize_t numRead;
 	pid_t childPid;
 	time_t curr_time;
 	char *pctime;
 	char time_str[MAXTIMELEN];
 	struct sigaction act;
+	struct timeval start_tv;
+	int pass_time;
+	int index;
 
 	/* Retrieve the attributes of terminal on which we are started */
 
@@ -71,6 +79,8 @@ int main(int argc, char *argv[])
 	if (childPid == -1)
 		errExit("ptyFork");
 
+	if (gettimeofday(&start_tv, NULL) == -1)
+		errExit("gettimeofday");
 	if (childPid == 0)
 	{ /* Child: execute a shell on pty slave */
 		if (time(&curr_time) == -1)
@@ -104,6 +114,10 @@ int main(int argc, char *argv[])
 	if (scriptFd == -1)
 		errExit("open typescript");
 
+	replayFd = open("replay", O_CREAT | O_TRUNC | O_WRONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
+	if (replayFd == -1)
+		errExit("open replay");
+
 	/* Place terminal in raw mode so that we can pass all terminal
      input to the pseudoterminal master untouched */
 
@@ -117,6 +131,8 @@ int main(int argc, char *argv[])
        them to the pty master. If the pty master is ready for input,
        then read some bytes and write them to the terminal. */
 
+	index = 0;
+	command[0] = '\0';
 	for (;;)
 	{
 		FD_ZERO(&inFds);
@@ -136,6 +152,26 @@ int main(int argc, char *argv[])
 			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
 			if (numRead <= 0) // 正常退出^D也是通过这个途径
 				exit(EXIT_SUCCESS);
+
+			for (int i = 0; i < numRead; ++i)
+			{
+				if (index == BUF_SIZE)
+					errExit("overflow");
+				command[index++] = buf[i];
+				if (buf[i] == '\r') // 注意这是原始模式的终端
+				{
+					if (index == BUF_SIZE)
+						errExit("overflow");
+					command[index] = '\0';
+					if ((pass_time = passtime(&start_tv)) == -1)
+						errExit("passtime");
+					sprintf(buf2, "%d %s", pass_time, command); // 这里是%s要注意'\0'必须要有不然溢出
+					if (write(replayFd, buf2, strlen(buf2)) != strlen(buf2))
+						fatal("partial/failed write (scriptFd)");
+					index = 0;
+					command[index] = '\0';
+				}
+			}
 
 			if (write(masterFd, buf, numRead) != numRead)
 				fatal("partial/failed write (masterFd)");
@@ -161,4 +197,12 @@ int main(int argc, char *argv[])
 				fatal("partial/failed write (scriptFd)");
 		}
 	}
+}
+
+int passtime(const struct timeval *start)
+{
+	struct timeval tv;
+	if (!start || gettimeofday(&tv, NULL) == -1)
+		return -1;
+	return (tv.tv_sec - start->tv_sec) * 1000 + (tv.tv_usec - start->tv_usec);
 }
