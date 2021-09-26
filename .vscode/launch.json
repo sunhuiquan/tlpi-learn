@@ -8,10 +8,14 @@
 			"name": "gcc-9",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/script_replay.out",
-			"args": [],
+			"program": "${fileDirname}/unbuffer.out",
+			"args": [
+				"ls",
+				":",
+				"cat"
+			],
 			"stopAtEntry": false,
-			"cwd": "${workspaceFolder}/Exercise/64/4", // 当前工作路径，绝对vscode相对路径的地方
+			"cwd": "${workspaceFolder}/Exercise/64/7", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
 			"externalConsole": false,
 			"MIMode": "gdb",

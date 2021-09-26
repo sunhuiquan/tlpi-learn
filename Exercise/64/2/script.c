@@ -148,7 +148,7 @@ int main(int argc, char *argv[])
 				if (time(&curr_time) == -1)
 					errExit("time");
 				pctime = ctime(&curr_time);
-				snprintf(time_str, MAXTIMELEN, "Script started on %s\n", (pctime == NULL) ? "can't get time" : pctime);
+				snprintf(time_str, MAXTIMELEN, "Script ended on %s\n", (pctime == NULL) ? "can't get time" : pctime);
 				printf("%s\n", time_str);
 				if (write(scriptFd, time_str, strlen(time_str)) != strlen(time_str))
 					fatal("partial/failed write (scriptFd)");

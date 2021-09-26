@@ -22,10 +22,6 @@ void sigwinch_handler(int sig)
 	int saved_errno = errno;
 
 	struct winsize ws;
-	// if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)
-	// 	errExit("ioctl");
-	// if (ioctl(masterFd, TIOCSWINSZ, &ws) == -1)
-	// 	errExit("ioctl");
 
 	// 因为终端大小设置失败也不致命，只要保护好errno值就行
 	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1)
@@ -41,19 +37,40 @@ ttyReset(void)
 		errExit("tcsetattr");
 }
 
+#define MAXLINE 1024
+
 int main(int argc, char *argv[])
 {
 	char slaveName[MAX_SNAME];
-	char *shell;
 	struct winsize ws;
-	fd_set inFds;
 	char buf[BUF_SIZE];
 	ssize_t numRead;
 	pid_t childPid;
-	time_t curr_time;
-	char *pctime;
-	char time_str[MAXTIMELEN];
 	struct sigaction act;
+	int index, j;
+	char args1[argc][MAXLINE], args2[argc][MAXLINE];
+
+	if (argc < 4)
+	{
+		printf("%s usage: <command1> : <command2>\n", argv[0]);
+		printf("注意要 : 因为 | 就是被shell解释成管道，而不是我们的实现\n");
+		exit(EXIT_SUCCESS);
+	}
+
+	index = 0;
+	for (j = 0; j < argc; ++j)
+		if (!strcmp(argv[j], ":"))
+		{
+			index = j;
+			break;
+		}
+	if (j == argc)
+		errExit("no : character");
+
+	for (int i = 1, a = 0; i < index; ++i, ++a)
+		strncpy(args1[a], argv[i], MAXLINE);
+	for (int i = index + 1, a = 0; i < argc; ++i, ++a)
+		strncpy(args2[a], argv[i], MAXLINE);
 
 	/* Retrieve the attributes of terminal on which we are started */
 
@@ -72,20 +89,10 @@ int main(int argc, char *argv[])
 
 	if (childPid == 0)
 	{ /* Child: execute a shell on pty slave */
-		if (time(&curr_time) == -1)
-			errExit("time");
-		pctime = ctime(&curr_time);
-		printf("Script started on %s\n", (pctime == NULL) ? "can't get time" : pctime);
-
-		/* If the SHELL variable is set, use its value to determine
-           the shell execed in child. Otherwise use /bin/sh. */
-
-		shell = getenv("SHELL");
-		if (shell == NULL || *shell == '\0')
-			shell = "/bin/sh";
-
-		execlp(shell, shell, (char *)NULL);
-		errExit("execlp"); /* If we get here, something went wrong */
+		// 已经重定向到从设备
+		printf("%ld\n", (long)getpid());
+		execvp(args2[0], args2); // p means also search in path dirctionary
+		errExit("execlp");		 /* If we get here, something went wrong */
 	}
 
 	/* Parent: relay data between terminal and pty master */
@@ -104,20 +111,32 @@ int main(int argc, char *argv[])
 	if (atexit(ttyReset) != 0)
 		errExit("atexit");
 
-	if (write(masterFd, argv[1], strlen(argv[1])) != strlen(argv[1]))
-		fatal("partial/failed write (masterFd)");
+	switch (fork())
+	{
+	case -1:
+		errExit("fork");
+		break;
+
+	case 0:
+		if (dup2(masterFd, STDOUT_FILENO) == -1)
+			errExit("dup2");
+		if (masterFd != STDOUT_FILENO)
+			close(masterFd);
+
+		execvp(args1[0], args1);
+		errExit("execlp"); /* If we get here, something went wrong */
+		_exit(EXIT_SUCCESS);
+		break;
+
+	default:
+		break;
+	}
+
 	for (;;)
 	{
 		numRead = read(masterFd, buf, BUF_SIZE);
 		if (numRead <= 0) // 正常退出也是通过这个途径
-		{
-			if (time(&curr_time) == -1)
-				errExit("time");
-			pctime = ctime(&curr_time);
-			snprintf(time_str, MAXTIMELEN, "Script started on %s\n", (pctime == NULL) ? "can't get time" : pctime);
-			printf("%s\n", time_str);
 			exit(EXIT_SUCCESS);
-		}
 
 		if (write(STDOUT_FILENO, buf, numRead) != numRead)
 			fatal("partial/failed write (STDOUT_FILENO)");
