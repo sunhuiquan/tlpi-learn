@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 						errExit("gettimeofday");
 				} while (((curr.tv_sec - start.tv_sec) * 1000000 + (curr.tv_usec - curr.tv_usec)) < cts);
 
-				if (write(masterFd, command, numRead) != numRead)
+				if (write(masterFd, buf3, strlen(buf3)) != strlen(buf3))
 					fatal("partial/failed write (masterFd)");
 				command[0] = '\0';
 			}
@@ -201,11 +201,11 @@ int main(int argc, char *argv[])
 				buf2[index++] = buf[i];
 				if (buf[i] == '\n')
 				{
-					buf2[index] = '\0';
+					buf2[index] = '\0'; // 这样strlen就能计算了
 					if (write(pfd[1], buf2, strlen(buf2)) != strlen(buf2))
 						errExit("write");
+					index = 0;
 				}
-				index = 0;
 			}
 		}
 
