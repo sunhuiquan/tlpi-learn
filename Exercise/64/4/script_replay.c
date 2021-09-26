@@ -58,11 +58,12 @@ int main(int argc, char *argv[])
 	char *pctime;
 	char time_str[MAXTIMELEN];
 	struct sigaction act;
-	int maxfd, cts;
+	int maxfd;
+	long cts;
 	struct timeval start, curr;
 	int index;
 	int pfd[2];
-	char bufc[BUF_SIZE], *pbuf, command[BUF_SIZE];
+	char *pbuf, command[BUF_SIZE];
 	int readn;
 
 	/* Retrieve the attributes of terminal on which we are started */
@@ -117,16 +118,21 @@ int main(int argc, char *argv[])
 		close(pfd[1]);
 		for (;;)
 		{
-			if ((readn = readline(pfd[0], command, BUF_SIZE)) <= 0)
+			readn = readline(pfd[0], command, BUF_SIZE);
+			if (readn == 0) // 无数据可读，父进程关闭后会返回EOF
+				_exit(EXIT_SUCCESS);
+			else if (readn < 0)
 				errExit("readline");
 
-			command[strlen(readn)] = '\0';
+			command[readn] = '\0'; // 记住strlen和read的大小含转义字符，除了'\0'
 			if ((pbuf = strchr(command, ' ')) == NULL)
 				errExit("format wrong");
 			*pbuf = '\0';
 			++pbuf;
-			if (sscanf(command, "%d", &cts) != 1)
+			if (sscanf(command, "%ld", &cts) != 1)
 				errExit("sscanf");
+
+			// printf("%ld - %s", cts, pbuf);
 
 			// to do: 这里为了简化测试我们用了自旋，一会为了性能可以通过定时器加信号的策略
 			do
@@ -135,6 +141,8 @@ int main(int argc, char *argv[])
 					errExit("gettimeofday");
 			} while (((curr.tv_sec - start.tv_sec) * 1000000 + (curr.tv_usec - curr.tv_usec)) < cts);
 
+			// printf("%ld - %ld\n", cts, (curr.tv_sec - start.tv_sec) * 1000000 + (curr.tv_usec - curr.tv_usec));
+			// printf("command: %s", pbuf);
 			if (write(masterFd, pbuf, strlen(pbuf)) != strlen(pbuf))
 				fatal("partial/failed write (masterFd)");
 			command[0] = '\0';
@@ -250,7 +258,7 @@ int readline(int fd, char *buf, int sz)
 		if (ch == '\n')
 		{
 			buffer[index] = '\0';
-			strncpy(buf, buffer, sizeof(buffer)); // 这个是把'\0'也复制过去，所以是sizeof含着'\0'
+			strncpy(buf, buffer, BUF_SIZE); // 这个是把'\0'也复制过去
 			return index;
 		}
 	}
