@@ -162,10 +162,17 @@ int main(int argc, char *argv[])
 					break; // ^D
 				if (index == BUF_SIZE)
 					errExit("overflow");
-				command[index++] = buf[i];
-				if (buf[i] == '\r') // 注意这是fsf原始模式的终端
+				if (buf[i] == 127) // delete 控制字符
 				{
-					buf[i] = '\n';
+					if (index > 0)
+						--index;
+				}
+				else
+					command[index++] = buf[i];
+
+				if (buf[i] == '\r') // 注意这是原始模式的终端
+				{
+					command[index - 1] = '\n';
 					if (index == BUF_SIZE)
 						errExit("overflow");
 					command[index] = '\0';
@@ -211,5 +218,5 @@ int passtime(const struct timeval *start)
 	struct timeval tv;
 	if (!start || gettimeofday(&tv, NULL) == -1)
 		return -1;
-	return (tv.tv_sec - start->tv_sec) * 1000 + (tv.tv_usec - start->tv_usec);
+	return (tv.tv_sec - start->tv_sec) * 1000000 + (tv.tv_usec - start->tv_usec);
 }
