@@ -1,12 +1,12 @@
-Script started on Sat Sep 25 09:28:12 2021
+Script started on Sun Sep 26 11:28:51 2021
 
-]0;water@DESKTOP-17L4VM3: ~/work/TLPI_learn_note/Exercise/64/4[01;32mwater@DESKTOP-17L4VM3[00m:[01;34m~/work/TLPI_learn_note/Exercise/64/4[00m$ ls
--  replay  scipt_replay.c  script_time.c  [0m[01;32mscript_time.out[0m  typescript
 ]0;water@DESKTOP-17L4VM3: ~/work/TLPI_learn_note/Exercise/64/4[01;32mwater@DESKTOP-17L4VM3[00m:[01;34m~/work/TLPI_learn_note/Exercise/64/4[00m$ more
 more: bad usage
 Try 'more --help' for more information.
 ]0;water@DESKTOP-17L4VM3: ~/work/TLPI_learn_note/Exercise/64/4[01;32mwater@DESKTOP-17L4VM3[00m:[01;34m~/work/TLPI_learn_note/Exercise/64/4[00m$ echo aa
 aa
+]0;water@DESKTOP-17L4VM3: ~/work/TLPI_learn_note/Exercise/64/4[01;32mwater@DESKTOP-17L4VM3[00m:[01;34m~/work/TLPI_learn_note/Exercise/64/4[00m$ ls
+-  replay  scipt_replay.c  script_time.c  [0m[01;32mscript_time.out[0m  typescript
 ]0;water@DESKTOP-17L4VM3: ~/work/TLPI_learn_note/Exercise/64/4[01;32mwater@DESKTOP-17L4VM3[00m:[01;34m~/work/TLPI_learn_note/Exercise/64/4[00m$ exit
-Script started on Sat Sep 25 09:28:17 2021
+Script started on Sun Sep 26 11:28:56 2021
 

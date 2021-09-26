@@ -153,19 +153,26 @@ int main(int argc, char *argv[])
 			if (numRead <= 0) // 正常退出^D也是通过这个途径
 				exit(EXIT_SUCCESS);
 
+			// buf[numRead] = '\0';
+			// printf("[buf: %s]\n", buf);
+
 			for (int i = 0; i < numRead; ++i)
 			{
+				if (buf[i] == 4)
+					break; // ^D
 				if (index == BUF_SIZE)
 					errExit("overflow");
 				command[index++] = buf[i];
-				if (buf[i] == '\r') // 注意这是原始模式的终端
+				if (buf[i] == '\r') // 注意这是fsf原始模式的终端
 				{
+					buf[i] = '\n';
 					if (index == BUF_SIZE)
 						errExit("overflow");
 					command[index] = '\0';
 					if ((pass_time = passtime(&start_tv)) == -1)
 						errExit("passtime");
 					sprintf(buf2, "%d %s", pass_time, command); // 这里是%s要注意'\0'必须要有不然溢出
+					printf("command: %s\n", command);
 					if (write(replayFd, buf2, strlen(buf2)) != strlen(buf2))
 						fatal("partial/failed write (scriptFd)");
 					index = 0;
