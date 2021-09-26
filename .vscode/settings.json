@@ -61,7 +61,8 @@
 		"poll.h": "c",
 		"termios.h": "c",
 		"select.h": "c",
-		"pty_fork.h": "c"
+		"pty_fork.h": "c",
+		"pty_master_open.h": "c"
 	},
 	"C_Cpp.errorSquiggles": "Enabled"
 }
