@@ -4,6 +4,7 @@
 #include <tlpi_hdr.h>
 
 #define SSH_SERVICE 22
+#define MAXLINE 1024
 
 int main()
 {
