@@ -18,6 +18,8 @@
 struct termios ttyOrig;
 int masterFd;
 
+int readline(int fd, char *buf, int sz);
+
 void sigwinch_handler(int sig)
 {
 	int saved_errno = errno;
@@ -60,7 +62,7 @@ int main(int argc, char *argv[])
 	struct timeval start, curr;
 	int index;
 	int pfd[2];
-	char bufc[BUF_SIZE], buf3[BUF_SIZE], command[BUF_SIZE];
+	char bufc[BUF_SIZE], *pbuf, command[BUF_SIZE];
 	int readn;
 
 	/* Retrieve the attributes of terminal on which we are started */
@@ -115,26 +117,27 @@ int main(int argc, char *argv[])
 		close(pfd[1]);
 		for (;;)
 		{
-			if ((readn = read(pfd[0], bufc, BUF_SIZE)) < 0)
-				errExit("read");
-			strcat(command, bufc);
+			if ((readn = readline(pfd[0], command, BUF_SIZE)) <= 0)
+				errExit("readline");
 
-			if (strchr(command, '\n') != NULL)
+			command[strlen(readn)] = '\0';
+			if ((pbuf = strchr(command, ' ')) == NULL)
+				errExit("format wrong");
+			*pbuf = '\0';
+			++pbuf;
+			if (sscanf(command, "%d", &cts) != 1)
+				errExit("sscanf");
+
+			// to do: 这里为了简化测试我们用了自旋，一会为了性能可以通过定时器加信号的策略
+			do
 			{
-				if (sscanf(command, "%d %s", &cts, buf3) != 2)
-					errExit("sscanf");
+				if (gettimeofday(&curr, NULL) == -1)
+					errExit("gettimeofday");
+			} while (((curr.tv_sec - start.tv_sec) * 1000000 + (curr.tv_usec - curr.tv_usec)) < cts);
 
-				// to do: 这里为了简化测试我们用了自旋，一会为了性能可以通过定时器加信号的策略
-				do
-				{
-					if (gettimeofday(&curr, NULL) == -1)
-						errExit("gettimeofday");
-				} while (((curr.tv_sec - start.tv_sec) * 1000000 + (curr.tv_usec - curr.tv_usec)) < cts);
-
-				if (write(masterFd, buf3, strlen(buf3)) != strlen(buf3))
-					fatal("partial/failed write (masterFd)");
-				command[0] = '\0';
-			}
+			if (write(masterFd, pbuf, strlen(pbuf)) != strlen(pbuf))
+				fatal("partial/failed write (masterFd)");
+			command[0] = '\0';
 		}
 		_exit(EXIT_FAILURE);
 		break;
@@ -228,6 +231,27 @@ int main(int argc, char *argv[])
 				fatal("partial/failed write (STDOUT_FILENO)");
 			if (write(scriptFd, buf, numRead) != numRead)
 				fatal("partial/failed write (scriptFd)");
+		}
+	}
+}
+
+int readline(int fd, char *buf, int sz)
+{
+	char buffer[BUF_SIZE], ch; // 静态变量初始值就是0，只有局部变量才要初始化
+	int index, readn;
+
+	index = 0;
+	while (true)
+	{
+		if ((readn = read(fd, &ch, 1)) <= 0)
+			return readn;
+
+		buffer[index++] = ch;
+		if (ch == '\n')
+		{
+			buffer[index] = '\0';
+			strncpy(buf, buffer, sizeof(buffer)); // 这个是把'\0'也复制过去，所以是sizeof含着'\0'
+			return index;
 		}
 	}
 }
