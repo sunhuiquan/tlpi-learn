@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 
 			// printf("%ld - %s", cts, pbuf);
 
-			// to do: 这里为了简化测试我们用了自旋，一会为了性能可以通过定时器加信号的策略
+			// 这里为了简化测试我们用了自旋，推荐定时器加信号的方式，避免自旋浪费CPU
 			do
 			{
 				if (gettimeofday(&curr, NULL) == -1)
