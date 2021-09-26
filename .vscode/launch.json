@@ -8,11 +8,8 @@
 			"name": "gcc-9",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/script_time.out",
-			"args": [
-				"-",
-				"0"
-			],
+			"program": "${fileDirname}/script_replay.out",
+			"args": [],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/Exercise/64/4", // 当前工作路径，绝对vscode相对路径的地方
 			"environment": [],
