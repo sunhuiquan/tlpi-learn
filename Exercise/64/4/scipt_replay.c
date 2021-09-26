@@ -6,6 +6,7 @@
 #include <sys/select.h>
 #include <tlpi_hdr.h>
 #include <time.h>
+#include <sys/time.h>
 #include <signal.h>
 #include "../../../tlpi-dist/pty/pty_fork.h"	  /* Declaration of ptyFork() */
 #include "../../../tlpi-dist/tty/tty_functions.h" /* Declaration of ttySetRaw() */
@@ -45,16 +46,22 @@ int main(int argc, char *argv[])
 {
 	char slaveName[MAX_SNAME];
 	char *shell;
-	int scriptFd;
+	int scriptFd, replayFd;
 	struct winsize ws;
 	fd_set inFds;
-	char buf[BUF_SIZE];
+	char buf[BUF_SIZE], buf2[BUF_SIZE];
 	ssize_t numRead;
 	pid_t childPid;
 	time_t curr_time;
 	char *pctime;
 	char time_str[MAXTIMELEN];
 	struct sigaction act;
+	int maxfd, cts;
+	struct timeval start, curr;
+	int index;
+	int pfd[2];
+	char bufc[BUF_SIZE], buf3[BUF_SIZE], command[BUF_SIZE];
+	int readn;
 
 	/* Retrieve the attributes of terminal on which we are started */
 
@@ -66,6 +73,9 @@ int main(int argc, char *argv[])
 	/* Create a child process, with parent and child connected via a
        pty pair. The child is connected to the pty slave and its terminal
        attributes are set to be the same as those retrieved above. */
+
+	if (gettimeofday(&start, NULL) == -1)
+		errExit("gettimeofday");
 
 	childPid = ptyFork(&masterFd, slaveName, MAX_SNAME, &ttyOrig, &ws);
 	if (childPid == -1)
@@ -91,17 +101,64 @@ int main(int argc, char *argv[])
 
 	/* Parent: relay data between terminal and pty master */
 
+	if (pipe(pfd) == -1)
+		errExit("pipe");
+
+	command[0] = '\0';
+	switch (fork())
+	{
+	case -1:
+		errExit("fork");
+		break;
+
+	case 0:
+		close(pfd[1]);
+		for (;;)
+		{
+			if ((readn = read(pfd[0], bufc, BUF_SIZE)) < 0)
+				errExit("read");
+			strcat(command, bufc);
+
+			if (strchr(command, '\n') != NULL)
+			{
+				if (sscanf(command, "%d %s", &cts, buf3) != 2)
+					errExit("sscanf");
+
+				// to do: 这里为了简化测试我们用了自旋，一会为了性能可以通过定时器加信号的策略
+				do
+				{
+					if (gettimeofday(&curr, NULL) == -1)
+						errExit("gettimeofday");
+				} while (((curr.tv_sec - start.tv_sec) * 1000000 + (curr.tv_usec - curr.tv_usec)) < cts);
+
+				if (write(masterFd, command, numRead) != numRead)
+					fatal("partial/failed write (masterFd)");
+				command[0] = '\0';
+			}
+		}
+		_exit(EXIT_FAILURE);
+		break;
+
+	default:
+		close(pfd[0]);
+		break;
+	}
+
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = SA_RESTART;
 	act.sa_handler = sigwinch_handler;
 	if (sigaction(SIGWINCH, &act, NULL) == -1)
 		errExit("sigaction");
 
-	scriptFd = open((argc > 1) ? argv[1] : "typescript",
+	scriptFd = open((argc > 1) ? argv[1] : "typescript_replay",
 					O_WRONLY | O_CREAT | O_TRUNC,
 					S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP |
 						S_IROTH | S_IWOTH);
 	if (scriptFd == -1)
+		errExit("open typescript");
+
+	replayFd = open((argc > 1) ? argv[1] : "replay", O_RDONLY);
+	if (replayFd == -1)
 		errExit("open typescript");
 
 	/* Place terminal in raw mode so that we can pass all terminal
@@ -117,13 +174,15 @@ int main(int argc, char *argv[])
        them to the pty master. If the pty master is ready for input,
        then read some bytes and write them to the terminal. */
 
+	index = 0;
+	maxfd = max(masterFd, replayFd);
 	for (;;)
 	{
 		FD_ZERO(&inFds);
-		FD_SET(STDIN_FILENO, &inFds);
+		FD_SET(replayFd, &inFds);
 		FD_SET(masterFd, &inFds);
 
-		if (select(masterFd + 1, &inFds, NULL, NULL, NULL) == -1)
+		if (select(maxfd + 1, &inFds, NULL, NULL, NULL) == -1)
 		{
 			if (errno = EINTR)
 				continue;
@@ -131,15 +190,25 @@ int main(int argc, char *argv[])
 				errExit("select");
 		}
 
-		if (FD_ISSET(STDIN_FILENO, &inFds))
+		if (FD_ISSET(replayFd, &inFds))
 		{ /* stdin --> pty */
-			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
+			numRead = read(replayFd, buf, BUF_SIZE);
 			if (numRead <= 0) // 正常退出^D也是通过这个途径
 				exit(EXIT_SUCCESS);
 
-			if (write(masterFd, buf, numRead) != numRead)
-				fatal("partial/failed write (masterFd)");
+			for (int i = 0; i < numRead; ++i)
+			{
+				buf2[index++] = buf[i];
+				if (buf[i] == '\n')
+				{
+					buf2[index] = '\0';
+					if (write(pfd[1], buf2, strlen(buf2)) != strlen(buf2))
+						errExit("write");
+				}
+				index = 0;
+			}
 		}
+
 		if (FD_ISSET(masterFd, &inFds))
 		{ /* pty --> stdout+file */
 			numRead = read(masterFd, buf, BUF_SIZE);

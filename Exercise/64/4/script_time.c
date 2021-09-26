@@ -75,12 +75,13 @@ int main(int argc, char *argv[])
        pty pair. The child is connected to the pty slave and its terminal
        attributes are set to be the same as those retrieved above. */
 
+	if (gettimeofday(&start_tv, NULL) == -1)
+		errExit("gettimeofday");
+
 	childPid = ptyFork(&masterFd, slaveName, MAX_SNAME, &ttyOrig, &ws);
 	if (childPid == -1)
 		errExit("ptyFork");
 
-	if (gettimeofday(&start_tv, NULL) == -1)
-		errExit("gettimeofday");
 	if (childPid == 0)
 	{ /* Child: execute a shell on pty slave */
 		if (time(&curr_time) == -1)
