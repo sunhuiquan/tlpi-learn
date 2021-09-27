@@ -8,11 +8,9 @@
 			"name": "gcc-9",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/ssh_sv.out",
+			"program": "${fileDirname}/ssh_cl.out",
 			"args": [
-				"ls",
-				":",
-				"cat"
+				"water@127.0.0.1"
 			],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}/Exercise/64/5", // 当前工作路径，绝对vscode相对路径的地方

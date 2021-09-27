@@ -1,4 +1,3 @@
-#include <inet_sockets.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -19,13 +18,13 @@ int main(int argc, char *argv[])
 
 	if (argc != 2 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
 	{
-		print("%s usage: <user@host>\n");
+		printf("%s usage: <user@host>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 
 	if ((pc = strchr(argv[1], '@')) == NULL)
 	{
-		print("%s usage: <user@host>\n");
+		printf("%s usage: <user@host>\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}
 	*pc = '\0';
