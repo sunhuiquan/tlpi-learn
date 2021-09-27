@@ -12,7 +12,7 @@
 #include "../../../tlpi-dist/pty/pty_fork.h"	  /* Declaration of ptyFork() */
 #include "../../../tlpi-dist/tty/tty_functions.h" /* Declaration of ttySetRaw() */
 
-#define SSH_SERVICE 9999
+#define SSH_SERVICE 22
 #define MAXLINE 1024
 #define BUF_SIZE 256
 #define MAX_SNAME 1000
@@ -81,7 +81,13 @@ int main()
 
 int do_ssh(int connfd)
 {
-
+	char slaveName[MAX_SNAME];
+	int masterFd;
+	struct winsize ws;
+	fd_set inFds;
+	char buf[BUF_SIZE];
+	ssize_t numRead;
+	pid_t childPid;
 	char user[MAXLINE];
 
 	// 读用户名
@@ -90,6 +96,29 @@ int do_ssh(int connfd)
 	user[strlen(user) - 1] = '\0'; // 删除\n变\0
 
 	// -----------------------------------------------------
+
+	/* Retrieve the attributes of terminal on which we are started */
+
+	if (tcgetattr(STDIN_FILENO, &ttyOrig) == -1)
+		errExit("tcgetattr");
+	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) < 0)
+		errExit("ioctl-TIOCGWINSZ");
+
+	/* Create a child process, with parent and child connected via a
+       pty pair. The child is connected to the pty slave and its terminal
+       attributes are set to be the same as those retrieved above. */
+
+	childPid = ptyFork(&masterFd, slaveName, MAX_SNAME, &ttyOrig, &ws);
+	if (childPid == -1)
+		errExit("ptyFork");
+
+	if (childPid == 0)
+	{
+		// child
+		execlp("login", "login", user, (char *)NULL);
+		// 变参NULL要手动转函数原型的类型，只是因为编译器的做法问题，比如定参就不用这样做
+		errExit("execlp"); /* If we get here, something went wrong */
+	}
 
 	return 0;
 }

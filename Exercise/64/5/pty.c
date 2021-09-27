@@ -32,8 +32,6 @@ int main(int argc, char *argv[])
 	char buf[BUF_SIZE];
 	ssize_t numRead;
 	pid_t childPid;
-	time_t curr_time;
-	char *pctime;
 
 	/* Retrieve the attributes of terminal on which we are started */
 

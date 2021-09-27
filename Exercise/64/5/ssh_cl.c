@@ -3,7 +3,7 @@
 #include <sys/select.h>
 #include <tlpi_hdr.h>
 
-#define SSH_SERVICE 9999
+#define SSH_SERVICE 22
 #define MAXLINE 1024
 
 int main(int argc, char *argv[])
