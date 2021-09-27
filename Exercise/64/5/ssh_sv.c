@@ -1,6 +1,7 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <utmp.h>
 #include <fcntl.h>
 #include <libgen.h>
 #include <termios.h>
