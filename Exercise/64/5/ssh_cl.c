@@ -48,13 +48,27 @@ int main()
 			{
 				closed = 1;
 				FD_CLR(STDIN_FILENO, &rfdset);
-				if (shutdown(cfd, SHUT_WR) == -1)
+				if (shutdown(cfd, SHUT_WR) == -1) // 对端收到FIN，且读connfd会得到EOF
 					errExit("shutdown");
 			}
+
+			if (write(cfd, buf, readn) != readn)
+				errExit("write");
 		}
 
 		if (FD_ISSET(cfd, &rfdset))
 		{
+			readn = read(cfd, buf, MAXLINE);
+			if (readn < 0)
+				errExit("read");
+			else if (readn == 0) // 对端关闭(由于之前shutdown并把剩余数据读完得到EOF，导致的关闭)
+			{
+				printf("lagout\n");
+				break; // 正常结束客户端
+			}
+
+			if (write(STDOUT_FILENO, buf, readn) != readn)
+				errExit("write");
 		}
 	}
 
