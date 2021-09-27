@@ -1,12 +1,36 @@
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <libgen.h>
+#include <termios.h>
+#include <sys/ioctl.h>
+#include <sys/select.h>
 #include <tlpi_hdr.h>
+#include <time.h>
+#include <signal.h>
+#include "../../../tlpi-dist/pty/pty_fork.h"	  /* Declaration of ptyFork() */
+#include "../../../tlpi-dist/tty/tty_functions.h" /* Declaration of ttySetRaw() */
 
 #define SSH_SERVICE 9999
 #define MAXLINE 1024
+#define BUF_SIZE 256
+#define MAX_SNAME 1000
+#define MAXTIMELEN 128
+
+struct termios ttyOrig;
+
+struct termios ttyOrig;
 
 int do_ssh(int connfd);
 int readline(int fd, char *buf, int sz);
+
+static void /* Reset terminal mode on program exit */
+ttyReset(void)
+{
+	if (tcsetattr(STDIN_FILENO, TCSANOW, &ttyOrig) == -1)
+		errExit("tcsetattr");
+}
 
 // 注意这个程序以root身份运行，因为设置22端口和执行login程序都需要root权限
 int main()
@@ -57,6 +81,7 @@ int main()
 
 int do_ssh(int connfd)
 {
+
 	char user[MAXLINE];
 
 	// 读用户名
@@ -64,7 +89,8 @@ int do_ssh(int connfd)
 		return -1;
 	user[strlen(user) - 1] = '\0'; // 删除\n变\0
 
-	printf("-%s-\n", user);
+	// -----------------------------------------------------
+
 	return 0;
 }
 
