@@ -124,7 +124,7 @@ int do_ssh(int connfd)
 
 	if (childPid == 0)
 	{
-		printf("%ld\n", (long)getpid());
+		// printf("%ld\n", (long)getpid());
 		// child
 		execlp("login", "login", user, (char *)NULL);
 		// 变参NULL要手动转函数原型的类型，只是因为编译器的做法问题，比如定参就不用这样做
