@@ -2,7 +2,7 @@
 #include <sys/socket.h>
 #include <tlpi_hdr.h>
 
-#define SSH_SERVICE 22
+#define SSH_SERVICE 9999
 #define MAXLINE 1024
 
 int do_ssh(int connfd);
@@ -63,6 +63,9 @@ int do_ssh(int connfd)
 	if (readline(connfd, user, MAXLINE) <= 0) // 用readline因为我们用了\n做分界
 		return -1;
 	user[strlen(user) - 1] = '\0'; // 删除\n变\0
+
+	printf("-%s-\n", user);
+	return 0;
 }
 
 int readline(int fd, char *buf, int sz)

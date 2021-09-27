@@ -8,7 +8,7 @@
 			"name": "gcc-9",
 			"type": "cppdbg",
 			"request": "launch",
-			"program": "${fileDirname}/ssh_cl.out",
+			"program": "${fileDirname}/ssh_sv.out",
 			"args": [
 				"water@127.0.0.1"
 			],
