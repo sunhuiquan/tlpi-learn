@@ -49,6 +49,9 @@ int main(int argc, char *argv[])
 	FD_ZERO(&rfdset);
 
 	// login的用户
+	int index = strlen(user);
+	user[index] = '\n';		// 下一行不能用strlen()，因为这一步会删掉\0导致错误
+	user[index + 1] = '\0'; // \n作为分隔字节流用
 	if (write(cfd, user, strlen(user)) != strlen(user))
 		errExit("write");
 

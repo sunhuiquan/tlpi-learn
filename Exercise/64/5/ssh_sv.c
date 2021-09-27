@@ -6,6 +6,7 @@
 #define MAXLINE 1024
 
 int do_ssh(int connfd);
+int readline(int fd, char *buf, int sz);
 
 // 注意这个程序以root身份运行，因为设置22端口和执行login程序都需要root权限
 int main()
@@ -56,5 +57,31 @@ int main()
 
 int do_ssh(int connfd)
 {
+	char user[MAXLINE];
+
 	// 读用户名
+	if (readline(connfd, user, MAXLINE) <= 0) // 用readline因为我们用了\n做分界
+		return -1;
+	user[strlen(user) - 1] = '\0'; // 删除\n变\0
+}
+
+int readline(int fd, char *buf, int sz)
+{
+	char buffer[MAXLINE], ch; // 静态变量初始值就是0，只有局部变量才要初始化
+	int index, readn;
+
+	index = 0;
+	while (true)
+	{
+		if ((readn = read(fd, &ch, 1)) <= 0)
+			return readn;
+
+		buffer[index++] = ch;
+		if (ch == '\n')
+		{
+			buffer[index] = '\0';
+			strncpy(buf, buffer, MAXLINE); // 这个是把'\0'也复制过去
+			return index;
+		}
+	}
 }
