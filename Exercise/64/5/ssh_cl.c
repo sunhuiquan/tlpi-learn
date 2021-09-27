@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
 	strncpy(host, pc + 1, MAXLINE);
 
 	// for testing
-	printf("user: %s; host: %s\n", user, host);
+	// printf("user: %s; host: %s\n", user, host);
 
 	if ((cfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		errExit("socket");

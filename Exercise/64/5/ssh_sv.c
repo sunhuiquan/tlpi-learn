@@ -6,6 +6,8 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 #include <sys/select.h>
+#include <sys/signal.h>
+#include <sys/wait.h>
 #include <tlpi_hdr.h>
 #include <time.h>
 #include <signal.h>
@@ -23,11 +25,20 @@ struct termios ttyOrig;
 int do_ssh(int connfd);
 int readline(int fd, char *buf, int sz);
 
+void sigchld_handler(int sig)
+{
+	int saved = errno;
+	while (waitpid(-1, NULL, WNOHANG) > 0)
+		;
+	errno = saved;
+}
+
 // 注意这个程序以root身份运行，因为设置22端口和执行login程序都需要root权限
 int main()
 {
 	int lfd, connfd;
 	struct sockaddr_in addr;
+	struct sigaction act;
 
 	if ((lfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		errExit("socket");
@@ -42,6 +53,12 @@ int main()
 		errExit("bind");
 	if (listen(lfd, 5) == -1)
 		errExit("listen");
+
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = SA_RESTART;
+	act.sa_handler = sigchld_handler;
+	if (sigaction(SIGCHLD, &act, NULL) == -1)
+		errExit("sigaction");
 
 	for (;;)
 	{
@@ -106,6 +123,7 @@ int do_ssh(int connfd)
 
 	if (childPid == 0)
 	{
+		printf("%ld\n", (long)getpid());
 		// child
 		execlp("login", "login", user, (char *)NULL);
 		// 变参NULL要手动转函数原型的类型，只是因为编译器的做法问题，比如定参就不用这样做
