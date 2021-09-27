@@ -91,6 +91,7 @@ int do_ssh(int connfd)
 	/* Retrieve the attributes of terminal on which we are started */
 
 	if (tcgetattr(STDIN_FILENO, &ttyOrig) == -1)
+		// 这里是主设备绑定的服务器的实际终端，后面根本用不到这些
 		errExit("tcgetattr");
 	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) < 0)
 		errExit("ioctl-TIOCGWINSZ");
@@ -115,10 +116,10 @@ int do_ssh(int connfd)
 	for (;;)
 	{
 		FD_ZERO(&inFds);
-		FD_SET(STDIN_FILENO, &inFds);
+		FD_SET(connfd, &inFds);
 		FD_SET(masterFd, &inFds);
 
-		if (select(masterFd + 1, &inFds, NULL, NULL, NULL) == -1)
+		if (select(max(connfd, masterFd) + 1, &inFds, NULL, NULL, NULL) == -1)
 		{
 			if (errno = EINTR)
 				continue;
@@ -126,22 +127,23 @@ int do_ssh(int connfd)
 				errExit("select");
 		}
 
-		if (FD_ISSET(STDIN_FILENO, &inFds))
+		if (FD_ISSET(connfd, &inFds))
 		{ /* stdin --> pty */
-			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
+			numRead = read(connfd, buf, BUF_SIZE);
 			if (numRead <= 0) // 正常退出^D也是通过这个途径
 				exit(EXIT_SUCCESS);
 
 			if (write(masterFd, buf, numRead) != numRead)
 				fatal("partial/failed write (masterFd)");
 		}
+
 		if (FD_ISSET(masterFd, &inFds))
 		{ /* pty --> stdout+file */
 			numRead = read(masterFd, buf, BUF_SIZE);
 			if (numRead <= 0) // 正常退出也是通过这个途径
 				exit(EXIT_SUCCESS);
 
-			if (write(STDOUT_FILENO, buf, numRead) != numRead)
+			if (write(connfd, buf, numRead) != numRead)
 				fatal("partial/failed write (STDOUT_FILENO)");
 		}
 	}
