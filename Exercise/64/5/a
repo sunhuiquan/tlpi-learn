@@ -17,23 +17,6 @@
 // struct termios ttyOrig;
 // int masterFd;
 
-// void sigwinch_handler(int sig)
-// {
-// 	int saved_errno = errno;
-
-// 	struct winsize ws;
-// 	// if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) == -1)
-// 	// 	errExit("ioctl");
-// 	// if (ioctl(masterFd, TIOCSWINSZ, &ws) == -1)
-// 	// 	errExit("ioctl");
-
-// 	// 因为终端大小设置失败也不致命，只要保护好errno值就行
-// 	if (ioctl(STDIN_FILENO, TIOCGWINSZ, &ws) != -1)
-// 		ioctl(masterFd, TIOCSWINSZ, &ws);
-
-// 	errno = saved_errno;
-// }
-
 // static void /* Reset terminal mode on program exit */
 // ttyReset(void)
 // {
@@ -90,12 +73,6 @@
 // 	}
 
 // 	/* Parent: relay data between terminal and pty master */
-
-// 	sigemptyset(&act.sa_mask);
-// 	act.sa_flags = SA_RESTART;
-// 	act.sa_handler = sigwinch_handler;
-// 	if (sigaction(SIGWINCH, &act, NULL) == -1)
-// 		errExit("sigaction");
 
 // 	scriptFd = open((argc > 1) ? argv[1] : "typescript",
 // 					O_WRONLY | O_CREAT | O_TRUNC,

@@ -7,13 +7,33 @@
 #define SSH_SERVICE 22
 #define MAXLINE 1024
 
-int main()
+int main(int argc, char *argv[])
 {
 	int cfd;
 	struct sockaddr_in addr;
 	int readn, closed;
 	char buf[MAXLINE];
 	fd_set rfdset;
+	char user[MAXLINE], host[MAXLINE];
+	char *pc;
+
+	if (argc != 2 || !strcmp(argv[1], "-h") || !strcmp(argv[1], "--help"))
+	{
+		print("%s usage: <user@host>\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if ((pc = strchr(argv[1], '@')) == NULL)
+	{
+		print("%s usage: <user@host>\n");
+		exit(EXIT_FAILURE);
+	}
+	*pc = '\0';
+	strncpy(user, argv[1], MAXLINE);
+	strncpy(host, pc + 1, MAXLINE);
+
+	// for testing
+	printf("user: %s; host: %s\n", user, host);
 
 	if ((cfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		errExit("socket");
@@ -21,13 +41,17 @@ int main()
 	bzero(&addr, sizeof(addr));
 	addr.sin_family = AF_INET;
 	addr.sin_port = htons(SSH_SERVICE);
-	if (inet_pton(AF_INET, "127.0.0.1", &addr.sin_addr) == -1)
+	if (inet_pton(AF_INET, host, &addr.sin_addr) == -1)
 		errExit("inet_pton");
 
 	if (connect(cfd, (struct sockaddr *)&addr, sizeof(addr)) == -1)
 		errExit("connect");
 
 	FD_ZERO(&rfdset);
+
+	// login的用户
+	if (write(cfd, user, strlen(user)) != strlen(user))
+		errExit("write");
 
 	closed = 0;
 	for (;;)

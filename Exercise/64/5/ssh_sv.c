@@ -6,6 +6,9 @@
 #define SSH_SERVICE 22
 #define MAXLINE 1024
 
+int do_ssh(int connfd);
+
+// 注意这个程序以root身份运行，因为设置22端口和执行login程序都需要root权限
 int main()
 {
 	int lfd, connfd;
@@ -38,7 +41,8 @@ int main()
 
 		case 0:
 			close(lfd);
-			// to do
+			if (do_ssh(connfd) == -1)
+				errExit("do_ssh");
 			_exit(EXIT_SUCCESS);
 			break;
 
@@ -49,4 +53,9 @@ int main()
 	}
 
 	return 0;
+}
+
+int do_ssh(int connfd)
+{
+	// 读用户名
 }
