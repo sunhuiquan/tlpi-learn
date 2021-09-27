@@ -20,17 +20,8 @@
 
 struct termios ttyOrig;
 
-struct termios ttyOrig;
-
 int do_ssh(int connfd);
 int readline(int fd, char *buf, int sz);
-
-static void /* Reset terminal mode on program exit */
-ttyReset(void)
-{
-	if (tcsetattr(STDIN_FILENO, TCSANOW, &ttyOrig) == -1)
-		errExit("tcsetattr");
-}
 
 // 注意这个程序以root身份运行，因为设置22端口和执行login程序都需要root权限
 int main()
@@ -118,6 +109,41 @@ int do_ssh(int connfd)
 		execlp("login", "login", user, (char *)NULL);
 		// 变参NULL要手动转函数原型的类型，只是因为编译器的做法问题，比如定参就不用这样做
 		errExit("execlp"); /* If we get here, something went wrong */
+	}
+
+	// parent
+	for (;;)
+	{
+		FD_ZERO(&inFds);
+		FD_SET(STDIN_FILENO, &inFds);
+		FD_SET(masterFd, &inFds);
+
+		if (select(masterFd + 1, &inFds, NULL, NULL, NULL) == -1)
+		{
+			if (errno = EINTR)
+				continue;
+			else
+				errExit("select");
+		}
+
+		if (FD_ISSET(STDIN_FILENO, &inFds))
+		{ /* stdin --> pty */
+			numRead = read(STDIN_FILENO, buf, BUF_SIZE);
+			if (numRead <= 0) // 正常退出^D也是通过这个途径
+				exit(EXIT_SUCCESS);
+
+			if (write(masterFd, buf, numRead) != numRead)
+				fatal("partial/failed write (masterFd)");
+		}
+		if (FD_ISSET(masterFd, &inFds))
+		{ /* pty --> stdout+file */
+			numRead = read(masterFd, buf, BUF_SIZE);
+			if (numRead <= 0) // 正常退出也是通过这个途径
+				exit(EXIT_SUCCESS);
+
+			if (write(STDOUT_FILENO, buf, numRead) != numRead)
+				fatal("partial/failed write (STDOUT_FILENO)");
+		}
 	}
 
 	return 0;
