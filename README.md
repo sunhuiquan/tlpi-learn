@@ -95,7 +95,7 @@ My notes and solutions for The Linux Programing Interface (TLPI)
 运行需要链接 libtlpi.a 静态库
 
 ```bash
-    g++ main.cpp -o main -ltlpi
+    g++ main.cpp -o main -l tlpi
 ```
 
 ---
